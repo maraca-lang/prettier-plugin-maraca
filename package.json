@@ -1,0 +1,18 @@
+{
+  "name": "prettier-plugin-maraca",
+  "version": "0.0.1",
+  "main": "lib/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "rimraf lib/* && tsc",
+    "test": "yarn build && node lib/test.js"
+  },
+  "dependencies": {
+    "maraca": "https://github.com/kalambo/maraca.git",
+    "prettier": "^1.14.3"
+  },
+  "devDependencies": {
+    "rimraf": "^2.6.2",
+    "typescript": "^3.1.6"
+  }
+}
