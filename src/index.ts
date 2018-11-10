@@ -5,10 +5,12 @@ const {
   breakParent,
   concat,
   group,
+  hardline,
   ifBreak,
   indent,
   join,
   line,
+  markAsRoot,
   softline,
 } = prettier.doc.builders;
 
@@ -31,77 +33,81 @@ export const parsers = {
   },
 };
 
+const indentBreak = (...docs) => ifBreak(indent(concat(docs)), concat(docs));
+
 const printConfig = (path, print, config) => {
   if (config.type === 'other') {
     if (config.key === true) {
-      return group(concat(['=>', line, path.call(print, 'output')]));
+      return group(
+        concat(['=>', indentBreak(line, path.call(print, 'output'))]),
+      );
     }
     if (config.value === true) {
-      return group(concat(['=>>', line, path.call(print, 'output')]));
+      return group(
+        concat(['=>>', indentBreak(line, path.call(print, 'output'))]),
+      );
     }
     if (!config.value) {
       return group(
         concat([
-          path.call(print, 'key'),
-          '=>',
-          line,
-          path.call(print, 'output'),
+          group(concat([path.call(print, 'key'), softline, '=>'])),
+          indentBreak(line, path.call(print, 'output')),
         ]),
       );
     }
     if (!config.key) {
       return group(
         concat([
-          path.call(print, 'value'),
-          '=>>',
-          line,
-          path.call(print, 'output'),
+          group(concat([path.call(print, 'value'), softline, '=>>'])),
+          indentBreak(line, path.call(print, 'output')),
         ]),
       );
     }
     return group(
       concat([
-        path.call(print, 'key'),
-        '=>',
-        line,
-        path.call(print, 'value'),
-        '=>',
-        line,
-        path.call(print, 'output'),
+        group(
+          concat([
+            path.call(print, 'key'),
+            softline,
+            '=>',
+            line,
+            path.call(print, 'value'),
+            softline,
+            '=>',
+          ]),
+        ),
+        indentBreak(line, path.call(print, 'output')),
       ]),
     );
   }
   if (config.type === 'set') {
     if (config.unpack) {
       if (config.args.length === 1) {
-        return group(concat(['::', softline, path.call(print, 'args', '0')]));
+        return group(
+          concat(['::', indentBreak(line, path.call(print, 'args', '0'))]),
+        );
       }
       return group(
         concat([
-          path.call(print, 'args', '0'),
-          softline,
-          '::',
-          softline,
-          path.call(print, 'args', '1'),
+          group(concat([path.call(print, 'args', '0'), softline, '::'])),
+          indentBreak(line, path.call(print, 'args', '1')),
         ]),
       );
     }
-    if (config.args.length === 1) {
-      return group(concat(['::', line, path.call(print, 'args', '0')]));
-    }
     if (config.args[1].type === 'nil') {
       if (config.args[0].type === 'value') {
-        return group(concat([':', softline, path.call(print, 'args', '0')]));
+        return group(
+          concat([':', indentBreak(softline, path.call(print, 'args', '0'))]),
+        );
       }
-      return group(concat([':', line, path.call(print, 'args', '0')]));
+      return group(
+        concat([':', indentBreak(line, path.call(print, 'args', '0'))]),
+      );
     }
     return group(
       concat([
-        path.call(print, 'args', '1'),
-        softline,
-        ':',
-        line,
-        path.call(print, 'args', '0'),
+        group(concat([path.call(print, 'args', '1'), softline, ':'])),
+        indentBreak(line, path.call(print, 'args', '0')),
       ]),
     );
   }
@@ -157,14 +163,32 @@ const printConfig = (path, print, config) => {
     );
   }
   if (config.type === 'combine') {
-    return group(join(config.tight ? '.' : ' ', path.map(print, 'args')));
+    if (config.args.some(c => c.type === 'context')) {
+      return concat(path.map(print, 'args'));
+    }
+    return concat([
+      path.call(print, 'args', '0'),
+      indentBreak(config.tight ? '.' : line, path.call(print, 'args', '1')),
+    ]);
   }
   if (config.type === 'any') return '*';
   if (config.type === 'value') {
-    if (/^((?:\d*\.\d+)|(?:[a-zA-Z0-9]+)|(?:\d+))$/.test(config.value)) {
+    if (config.value === ' ') {
+      return '_';
+    }
+    if (/^((?:\d*\.\d+)|(?:[a-zA-Z0-9]+))$/.test(config.value)) {
       return config.value;
     }
-    return `"${config.value.replace(/"/g, '\\"')}"`;
+    return group(
+      concat([
+        markAsRoot,
+        '"',
+        softline,
+        join(hardline, config.value.replace(/"/g, '\\"').split(/\n/g)),
+        softline,
+        '"',
+      ]),
+    );
   }
   if (config.type === 'nil') return '[]';
   if (config.type === 'context') return '?';
