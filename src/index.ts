@@ -50,7 +50,7 @@ const printConfig = (path, print, config) => {
     if (!config.value) {
       return group(
         concat([
-          group(concat([path.call(print, 'key'), softline, '=>'])),
+          concat([path.call(print, 'key'), '=>']),
           indentBreak(line, path.call(print, 'output')),
         ]),
       );
@@ -58,24 +58,18 @@ const printConfig = (path, print, config) => {
     if (!config.key) {
       return group(
         concat([
-          group(concat([path.call(print, 'value'), softline, '=>>'])),
+          concat([path.call(print, 'value'), '=>>']),
           indentBreak(line, path.call(print, 'output')),
         ]),
       );
     }
     return group(
       concat([
-        group(
-          concat([
-            path.call(print, 'key'),
-            softline,
-            '=>',
-            line,
-            path.call(print, 'value'),
-            softline,
-            '=>',
-          ]),
-        ),
+        path.call(print, 'key'),
+        '=>',
+        line,
+        path.call(print, 'value'),
+        '=>',
         indentBreak(line, path.call(print, 'output')),
       ]),
     );
@@ -89,24 +83,24 @@ const printConfig = (path, print, config) => {
       }
       return group(
         concat([
-          group(concat([path.call(print, 'args', '0'), softline, '::'])),
+          path.call(print, 'args', '0'),
+          '::',
           indentBreak(line, path.call(print, 'args', '1')),
         ]),
       );
     }
     if (config.args[1].type === 'nil') {
-      if (config.args[0].type === 'value') {
-        return group(
-          concat([':', indentBreak(softline, path.call(print, 'args', '0'))]),
-        );
-      }
       return group(
         concat([':', indentBreak(line, path.call(print, 'args', '0'))]),
       );
     }
+    if (config.args[0].type === 'nil') {
+      return concat([path.call(print, 'args', '1'), ':']);
+    }
     return group(
       concat([
-        group(concat([path.call(print, 'args', '1'), softline, ':'])),
+        path.call(print, 'args', '1'),
+        ':',
         indentBreak(line, path.call(print, 'args', '0')),
       ]),
     );
@@ -163,15 +157,28 @@ const printConfig = (path, print, config) => {
     );
   }
   if (config.type === 'combine') {
-    if (config.args.some(c => c.type === 'context')) {
-      return concat(path.map(print, 'args'));
+    if (config.tight) {
+      return group(
+        indent(join(concat([softline, '.']), path.map(print, 'args'))),
+      );
     }
-    return concat([
-      path.call(print, 'args', '0'),
-      indentBreak(config.tight ? '.' : line, path.call(print, 'args', '1')),
-    ]);
+    let first = true;
+    return group(
+      indent(
+        concat(
+          path.map((p, i) => {
+            if (i === 0) return print(p);
+            const c = p.getValue();
+            if (first && c.type === 'context') {
+              first = false;
+              return concat([softline, print(p)]);
+            }
+            return concat([line, print(p)]);
+          }, 'args'),
+        ),
+      ),
+    );
   }
-  if (config.type === 'any') return '*';
   if (config.type === 'value') {
     if (config.value === ' ') {
       return '_';

@@ -67,10 +67,10 @@ inherits@2:
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
   integrity sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
 
-maraca@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.1.0.tgz#1f20845b9d608bbef51c19e80a6c07df877e301f"
-  integrity sha512-N57V/yklVHfUUa2IZfA099tmI6Q1hWhvyDcyKXWQOkWivm0M+kU2KiifSiImUgfm244aX3sl+++WintCPa/WqA==
+maraca@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.1.1.tgz#e4935987b470028c9aa7c8f0d5f05ef8bbf07a30"
+  integrity sha512-T9lOJOL7DACwYs/OkPS76ia0JbMrUhxK3Ue0Sa2DZGVIdRnfNz+ef/rwU4aw62C9vfr1skF3BNvD8lhW+qT2kA==
   dependencies:
     chrono-node "^1.3.5"
     moo "^0.5.0"
@@ -129,10 +129,10 @@ path-is-absolute@^1.0.0:
   resolved "https://registry.yarnpkg.com/path-is-absolute/-/path-is-absolute-1.0.1.tgz#174b9268735534ffbc7ace6bf53a5a9e1b5c5f5f"
   integrity sha1-F0uSaHNVNP+8es5r9TpanhtcX18=
 
-prettier@^1.15.1:
-  version "1.15.1"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.15.1.tgz#06c67106afb1b40e74b002353b2079cc7e0e67bf"
-  integrity sha512-4rgV2hyc/5Pk0XHH4VjJWHRgVjgRbpMfLQjREAhHBtyW1UvTFkjJEsueGYNYYZd9mn97K+1qv0EBwm11zoaSgA==
+prettier@^1.15.2:
+  version "1.15.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.15.2.tgz#d31abe22afa4351efa14c7f8b94b58bb7452205e"
+  integrity sha512-YgPLFFA0CdKL4Eg2IHtUSjzj/BWgszDHiNQAe0VAIBse34148whfdzLagRL+QiKS+YfK5ftB6X4v/MBw8yCoug==
 
 railroad-diagrams@^1.0.0:
   version "1.0.0"
