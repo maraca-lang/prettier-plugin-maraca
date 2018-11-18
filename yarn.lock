@@ -67,10 +67,10 @@ inherits@2:
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
   integrity sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
 
-maraca@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.1.1.tgz#e4935987b470028c9aa7c8f0d5f05ef8bbf07a30"
-  integrity sha512-T9lOJOL7DACwYs/OkPS76ia0JbMrUhxK3Ue0Sa2DZGVIdRnfNz+ef/rwU4aw62C9vfr1skF3BNvD8lhW+qT2kA==
+maraca@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.1.3.tgz#6d6a35b3297e1f49124052a6033cfc440fc0e64c"
+  integrity sha512-JQamyrGz4XpI7zg9qFbnyS3TEFq54+knzpTpVyHvV3wq1WVcHDq+qhd+TtKzk3i++P+baxBE5O+vRZ4bQexqMw==
   dependencies:
     chrono-node "^1.3.5"
     moo "^0.5.0"

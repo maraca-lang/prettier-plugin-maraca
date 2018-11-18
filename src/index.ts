@@ -95,7 +95,7 @@ const printConfig = (path, print, config) => {
       );
     }
     if (config.args[0].type === 'nil') {
-      return concat([path.call(print, 'args', '1'), ':']);
+      return concat([path.call(print, 'args', '1'), ': ']);
     }
     return group(
       concat([
@@ -115,23 +115,8 @@ const printConfig = (path, print, config) => {
       join(concat([line, config.func, line]), path.map(print, 'args')),
     );
   }
-  if (config.type === 'eval' || config.type === 'js') {
-    if (config.arg.type === 'nil') {
-      return group(
-        concat([
-          { eval: '##', js: '#' }[config.type],
-          path.call(print, 'code'),
-        ]),
-      );
-    }
-    return group(
-      concat([
-        { eval: '##', js: '#' }[config.type],
-        path.call(print, 'code'),
-        line,
-        path.call(print, 'arg'),
-      ]),
-    );
+  if (config.type === 'eval') {
+    return group(concat([config.mode, path.call(print, 'code')]));
   }
   if (config.type === 'list') {
     return group(
@@ -162,20 +147,32 @@ const printConfig = (path, print, config) => {
         indent(join(concat([softline, '.']), path.map(print, 'args'))),
       );
     }
-    let first = true;
+    const firstContext = config.args.findIndex(c => c.type === 'context') || -1;
     return group(
       indent(
-        concat(
-          path.map((p, i) => {
-            if (i === 0) return print(p);
-            const c = p.getValue();
-            if (first && c.type === 'context') {
-              first = false;
-              return concat([softline, print(p)]);
+        concat([
+          group(
+            concat(
+              path.map((p, i) => {
+                if (i <= firstContext) {
+                  if (i === 0) return print(p);
+                  return concat([
+                    i === firstContext ? softline : line,
+                    print(p),
+                  ]);
+                }
+                return '';
+              }, 'args'),
+            ),
+          ),
+          ...path.map((p, i) => {
+            if (i > firstContext) {
+              if (i === 0) return print(p);
+              return concat([line, print(p)]);
             }
-            return concat([line, print(p)]);
+            return '';
           }, 'args'),
-        ),
+        ]),
       ),
     );
   }
