@@ -2,6 +2,7 @@ import * as prettier from 'prettier';
 
 const code = `
 [
+  @@ 100,
   [
     [:a, href: "", Home], [:a, href: about, About],
   ],
