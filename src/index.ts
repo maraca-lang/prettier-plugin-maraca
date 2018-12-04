@@ -177,7 +177,10 @@ const printConfig = (path, print, config) => {
     );
   }
   if (config.type === 'value') {
-    if (/^((?:\d*\.\d+)|(?:[a-zA-Z0-9]+))$/.test(config.value)) {
+    if (config.value.length === 1 && !/[a-zA-Z0-9]/.test(config.value)) {
+      return `\\${config.value}`;
+    }
+    if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(config.value)) {
       return config.value;
     }
     return group(
