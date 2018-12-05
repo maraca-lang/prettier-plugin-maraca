@@ -1,4 +1,4 @@
-import * as prettier from 'prettier';
+import * as prettier from 'prettier/standalone';
 import { parse } from 'maraca';
 
 const {
@@ -194,7 +194,7 @@ const printConfig = (path, print, config) => {
       ]),
     );
   }
-  if (config.type === 'nil') return '[]';
+  if (config.type === 'nil') return '""';
   if (config.type === 'context') return '?';
 };
 

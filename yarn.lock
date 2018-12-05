@@ -60,10 +60,10 @@ inherits@2:
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
   integrity sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
 
-maraca@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.2.1.tgz#2c945ba34864a5304eaaed03ed59ecb5ba307c83"
-  integrity sha512-3XEQXGy8Qzr1VZo1yjNrQMGCGubJp6zF+GCnKeYkPdIV6+3BC9C0hT9gUFuoYN6c37s4DpJDmKrIUO2Krlp3fg==
+maraca@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.2.2.tgz#c304f0e94860520abf62074f3a4aafc6ca8f9012"
+  integrity sha512-WZHK2Fy8Bk5oqZlfBg7cofU9GmkKBTjvDd4hvIhDeqnVsseag0G4MXg00ESzXXHaBdsLaZefdgErc1A4ko0/lA==
   dependencies:
     moo "^0.5.0"
     nearley "^2.15.1"
