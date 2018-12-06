@@ -85,9 +85,9 @@ const printConfig = (path, print, config) => {
       }
       return group(
         concat([
-          path.call(print, 'args', '0'),
+          path.call(print, 'args', '1'),
           '::',
-          indentBreak(line, path.call(print, 'args', '1')),
+          indentBreak(line, path.call(print, 'args', '0')),
         ]),
       );
     }
@@ -178,7 +178,7 @@ const printConfig = (path, print, config) => {
   }
   if (config.type === 'value') {
     if (config.value.length === 1 && !/[a-zA-Z0-9]/.test(config.value)) {
-      return `\\${config.value}`;
+      return `'${config.value}`;
     }
     if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(config.value)) {
       return config.value;
@@ -188,7 +188,7 @@ const printConfig = (path, print, config) => {
         markAsRoot,
         '"',
         softline,
-        join(hardline, config.value.replace(/"/g, '\\"').split(/\n/g)),
+        join(hardline, config.value.replace(/"/g, '""').split(/\n/g)),
         softline,
         '"',
       ]),

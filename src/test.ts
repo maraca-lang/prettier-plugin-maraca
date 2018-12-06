@@ -7,8 +7,8 @@ const code = `
     [:a, href: "", Home], [:a, href: about, About],
   ],
   (#url) [
-    : [:p, "Hi!"],
-    about: [:p, "About!"],   => [:p, "Not found..."],,
+    : [:p, Hi'!],
+    about: [:p, About'!],   => [:p, "Not found..."],,
   ]
 ]
 `;
