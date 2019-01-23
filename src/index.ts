@@ -76,7 +76,7 @@ const printConfig = (path, print, config) => {
     }
     return group(concat(['=>', indentBreak(line, path.call(print, 'output'))]));
   }
-  if (config.type === 'set') {
+  if (config.type === 'assign') {
     if (config.unpack) {
       if (config.args.length === 1) {
         return group(
