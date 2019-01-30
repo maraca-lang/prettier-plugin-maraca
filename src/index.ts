@@ -117,6 +117,15 @@ const printConfig = (path, print, config) => {
       ]),
     );
   }
+  if (config.type === 'copy') {
+    return group(
+      concat([
+        path.call(print, 'args', '1'),
+        ';',
+        indentBreak(line, path.call(print, 'args', '0')),
+      ]),
+    );
+  }
   if (config.type === 'dynamic') {
     return group(
       concat([
@@ -177,7 +186,7 @@ const printConfig = (path, print, config) => {
     );
   }
   if (config.type === 'value') {
-    if (config.value.length === 1 && !/[a-zA-Z0-9]/.test(config.value)) {
+    if (config.value.length === 1 && !/[a-zA-Z0-9 ]/.test(config.value)) {
       return `'${config.value}`;
     }
     if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(config.value)) {

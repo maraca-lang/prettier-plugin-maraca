@@ -60,10 +60,10 @@ inherits@2:
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
   integrity sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
 
-maraca@^0.2.4:
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.2.4.tgz#9a16aec425922d43700b11e8e4b2901e62fadee1"
-  integrity sha512-xlVfOtqlWHpPM7cuSqX9PatitrjelSu4xGT4ykaWRGho4Vv1NcnZ4xZTUlja4a5oINQaWqT5VyxTunUeLGD+Bw==
+maraca@^0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.2.5.tgz#22543866b76e5d0847216417b3d1d29cb35308ef"
+  integrity sha512-6pyD1N5ucDY5tDPyPXvRKDoP1Z4TgE0+sPMSdymZas4Y7mYdw7Xp4KEvbaq/gCOOfLmXOd9k1HbbF/Y/JRib6Q==
   dependencies:
     moo "^0.5.0"
     nearley "^2.16.0"
@@ -108,10 +108,10 @@ path-is-absolute@^1.0.0:
   resolved "https://registry.yarnpkg.com/path-is-absolute/-/path-is-absolute-1.0.1.tgz#174b9268735534ffbc7ace6bf53a5a9e1b5c5f5f"
   integrity sha1-F0uSaHNVNP+8es5r9TpanhtcX18=
 
-prettier@^1.16.1:
-  version "1.16.1"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.16.1.tgz#534c2c9d7853f8845e5e078384e71973bd74089f"
-  integrity sha512-XXUITwIkGb3CPJ2hforHah/zTINRyie5006Jd2HKy2qz7snEJXl0KLfsJZW/wst9g6R2rFvqba3VpNYdu1hDcA==
+prettier@^1.16.2:
+  version "1.16.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.16.2.tgz#f60bc5929a7f9a05260cc88d5430391100092414"
+  integrity sha512-vBMdCn1LjrFi2CpBsiWVKOq+WP9poXDTIGPe2sG3eE33LQ3b6IUgmaMjLZKKY+frD/8FqPeEK1qAx9mOV8iruA==
 
 railroad-diagrams@^1.0.0:
   version "1.0.0"
