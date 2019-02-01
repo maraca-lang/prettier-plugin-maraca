@@ -2,7 +2,6 @@ import * as prettier from 'prettier/standalone';
 import { parse } from 'maraca';
 
 const {
-  breakParent,
   concat,
   group,
   hardline,
@@ -142,26 +141,34 @@ const printConfig = (path, print, config) => {
       join(concat([line, config.func, line]), path.map(print, 'args')),
     );
   }
-  if (config.type === 'eval') {
-    return group(concat([config.mode, path.call(print, 'code')]));
+  if (config.type === 'lib') {
+    return group(concat(['#', path.call(print, 'arg')]));
   }
   if (config.type === 'list') {
+    const items = [] as any[];
+    let current = [] as any;
+    let lines = 0;
+    path.each(p => {
+      const c = p.getValue();
+      if (c.type === 'nil') {
+        current.push(',', ifBreak('', ' '));
+        lines++;
+      } else {
+        if (current.length > 0) {
+          items.push(concat(current));
+        }
+        current = [
+          ...Array.from({ length: lines }).map(() => softline),
+          print(p),
+        ];
+        lines = 0;
+      }
+    }, 'values');
+    items.push(concat(current));
     return group(
       concat([
         config.bracket,
-        indent(
-          concat([
-            softline,
-            join(
-              concat([',', line]),
-              path.map(p => {
-                const c = p.getValue();
-                if (c.type === 'nil') return '';
-                return print(p);
-              }, 'values'),
-            ),
-          ]),
-        ),
+        indent(concat([softline, join(concat([',', line]), items)])),
         ifBreak(',', ''),
         softline,
         { '[': ']', '(': ')', '{': '}' }[config.bracket],
@@ -186,8 +193,8 @@ const printConfig = (path, print, config) => {
     );
   }
   if (config.type === 'value') {
-    if (config.value.length === 1 && !/[a-zA-Z0-9 ]/.test(config.value)) {
-      return `'${config.value}`;
+    if (config.value.length === 1 && !/[a-zA-Z0-9]/.test(config.value)) {
+      return config.value === ' ' ? '_' : `'${config.value}`;
     }
     if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(config.value)) {
       return config.value;
@@ -196,28 +203,25 @@ const printConfig = (path, print, config) => {
       concat([
         markAsRoot,
         '"',
-        softline,
         join(hardline, config.value.replace(/"/g, '""').split(/\n/g)),
-        softline,
         '"',
       ]),
     );
   }
   if (config.type === 'nil') return '""';
   if (config.type === 'context') return '?';
-};
-
-const printBreak = (path, print, config) => {
-  const result = printConfig(path, print, config);
-  if (config.break) return concat([breakParent, result]);
-  return result;
+  if (config.type === 'comment') {
+    return group(
+      concat([markAsRoot, '`', join(hardline, config.value.split(/\n/g)), '`']),
+    );
+  }
 };
 
 export const printers = {
   maraca: {
     print(path, _, print) {
       const config = path.getValue();
-      return printBreak(path, print, config);
+      return printConfig(path, print, config);
     },
   },
 };

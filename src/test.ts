@@ -4,10 +4,12 @@ const code = `
 [
   @@ 100,
   [
-    [:a, href: "", Home], [:a, href: about, About],
+    [:a, href: "", Home, \`hello
+    there\`], [:a, href: about, About],,
+    "1 + ?"$1
   ],
   (#url) [
-    : [:p, Hi'!],
+    : [:p, Hi'!, " "],
     about: [:p, About'!],   => [:p, "Not found..."],,
   ]
 ]
