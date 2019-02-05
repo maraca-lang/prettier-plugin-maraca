@@ -34,117 +34,124 @@ export const parsers = {
 
 const indentBreak = (...docs) => ifBreak(indent(concat(docs)), concat(docs));
 
-const printConfig = (path, print, config) => {
-  if (config.type === 'other') {
-    if (config.map) {
-      if (config.key && config.value) {
+const printConfig = (
+  path,
+  print,
+  { type, nodes = [] as any[], info = {} as any },
+) => {
+  if (type === 'other') {
+    const [key, value] = nodes;
+    if (info.map) {
+      if (key && value) {
         return group(
           concat([
             group(
               concat([
-                path.call(print, 'key'),
+                path.call(print, 'nodes', '0'),
                 '=>',
                 line,
-                path.call(print, 'value'),
+                path.call(print, 'nodes', '1'),
                 '=>',
               ]),
             ),
-            indentBreak(line, path.call(print, 'output')),
+            indentBreak(line, path.call(print, 'nodes', '2')),
           ]),
         );
       }
-      if (config.value) {
+      if (value) {
         return group(
           concat([
-            concat([path.call(print, 'value'), '=>>']),
-            indentBreak(line, path.call(print, 'output')),
+            concat([path.call(print, 'nodes', '1'), '=>>']),
+            indentBreak(line, path.call(print, 'nodes', '2')),
           ]),
         );
       }
       return group(
-        concat(['=>>', indentBreak(line, path.call(print, 'output'))]),
+        concat(['=>>', indentBreak(line, path.call(print, 'nodes', '2'))]),
       );
     }
-    if (config.value) {
+    if (value) {
       return group(
         concat([
-          concat([path.call(print, 'value'), '=>']),
-          indentBreak(line, path.call(print, 'output')),
+          concat([path.call(print, 'nodes', '1'), '=>']),
+          indentBreak(line, path.call(print, 'nodes', '2')),
         ]),
       );
     }
-    return group(concat(['=>', indentBreak(line, path.call(print, 'output'))]));
+    return group(
+      concat(['=>', indentBreak(line, path.call(print, 'nodes', '2'))]),
+    );
   }
-  if (config.type === 'assign') {
-    if (config.unpack) {
-      if (config.args.length === 1) {
+  if (type === 'assign') {
+    if (info.unpack) {
+      if (nodes.length === 1) {
         return group(
-          concat(['::', indentBreak(line, path.call(print, 'args', '0'))]),
+          concat(['::', indentBreak(line, path.call(print, 'nodes', '0'))]),
         );
       }
       return group(
         concat([
-          path.call(print, 'args', '1'),
+          path.call(print, 'nodes', '1'),
           '::',
-          indentBreak(line, path.call(print, 'args', '0')),
+          indentBreak(line, path.call(print, 'nodes', '0')),
         ]),
       );
     }
-    if (config.args[1].type === 'nil') {
+    if (nodes[1].type === 'nil') {
       return group(
-        concat([':', indentBreak(line, path.call(print, 'args', '0'))]),
+        concat([':', indentBreak(line, path.call(print, 'nodes', '0'))]),
       );
     }
-    if (config.args[0].type === 'nil') {
-      return concat([path.call(print, 'args', '1'), ': ']);
+    if (nodes[0].type === 'nil') {
+      return concat([path.call(print, 'nodes', '1'), ': ']);
     }
-    if (config.args[0] === config.args[1]) {
-      return concat([path.call(print, 'args', '1'), ':=']);
+    if (nodes[0] === nodes[1]) {
+      return concat([path.call(print, 'nodes', '1'), ':=']);
     }
     if (
-      config.args[0].type === 'combine' &&
-      config.args[0].args[0] === config.args[1] &&
-      config.args[0].args[1].type === 'context'
+      nodes[0].type === 'combine' &&
+      nodes[0].nodes[0] === nodes[1] &&
+      nodes[0].nodes[1].type === 'context'
     ) {
-      return concat([path.call(print, 'args', '1'), ':=?']);
+      return concat([path.call(print, 'nodes', '1'), ':=?']);
     }
     return group(
       concat([
-        path.call(print, 'args', '1'),
+        path.call(print, 'nodes', '1'),
         ':',
-        indentBreak(line, path.call(print, 'args', '0')),
+        indentBreak(line, path.call(print, 'nodes', '0')),
       ]),
     );
   }
-  if (config.type === 'copy') {
+  if (type === 'copy') {
     return group(
       concat([
-        path.call(print, 'args', '1'),
+        path.call(print, 'nodes', '1'),
         ';',
-        indentBreak(line, path.call(print, 'args', '0')),
+        indentBreak(line, path.call(print, 'nodes', '0')),
       ]),
     );
   }
-  if (config.type === 'dynamic') {
+  if (type === 'interpret') {
     return group(
       concat([
-        Array.from({ length: config.level + 1 }).join('@'),
-        path.call(print, 'arg'),
+        Array.from({ length: info.level + 1 }).join('@'),
+        path.call(print, 'nodes', '0'),
       ]),
     );
   }
-  if (config.type === 'core') {
-    if (config.args.length === 1) {
-      return group(concat([config.func, path.call(print, 'args', '0')]));
+  if (type === 'core') {
+    if (nodes.length === 1) {
+      return group(concat([info.func, path.call(print, 'nodes', '0')]));
     }
     return group(
-      join(concat([line, config.func, line]), path.map(print, 'args')),
+      join(concat([line, info.func, line]), path.map(print, 'nodes')),
     );
   }
-  if (config.type === 'lib') {
-    return group(concat(['#', path.call(print, 'arg')]));
+  if (type === 'library') {
+    return group(concat(['#', path.call(print, 'nodes', '0')]));
   }
-  if (config.type === 'list') {
+  if (type === 'list') {
     const items = [] as any[];
     let current = [] as any;
     let lines = 0;
@@ -163,56 +170,56 @@ const printConfig = (path, print, config) => {
         ];
         lines = 0;
       }
-    }, 'values');
+    }, 'nodes');
     items.push(concat(current));
     return group(
       concat([
-        config.bracket,
+        info.bracket,
         indent(concat([softline, join(concat([',', line]), items)])),
         ifBreak(',', ''),
         softline,
-        { '[': ']', '(': ')', '{': '}' }[config.bracket],
+        { '[': ']', '(': ')', '{': '}' }[info.bracket],
       ]),
     );
   }
-  if (config.type === 'combine') {
+  if (type === 'combine') {
     return group(
       indent(
         concat(
           path.map(
             (p, i) =>
               concat([
-                ...(i !== 0 && config.dot ? [softline, '.'] : []),
+                ...(i !== 0 && info.dot ? [softline, '.'] : []),
                 print(p),
-                config.space && config.space[i] ? line : '',
+                info.space && info.space[i] ? line : '',
               ]),
-            'args',
+            'nodes',
           ),
         ),
       ),
     );
   }
-  if (config.type === 'value') {
-    if (config.value.length === 1 && !/[a-zA-Z0-9]/.test(config.value)) {
-      return config.value === ' ' ? '_' : `'${config.value}`;
+  if (type === 'value') {
+    if (info.value.length === 1 && !/[a-zA-Z0-9]/.test(info.value)) {
+      return info.value === ' ' ? '_' : `'${info.value}`;
     }
-    if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(config.value)) {
-      return config.value;
+    if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(info.value)) {
+      return info.value;
     }
     return group(
       concat([
         markAsRoot,
         '"',
-        join(hardline, config.value.replace(/"/g, '""').split(/\n/g)),
+        join(hardline, info.value.replace(/"/g, '""').split(/\n/g)),
         '"',
       ]),
     );
   }
-  if (config.type === 'nil') return '""';
-  if (config.type === 'context') return '?';
-  if (config.type === 'comment') {
+  if (type === 'nil') return '""';
+  if (type === 'context') return '?';
+  if (type === 'comment') {
     return group(
-      concat([markAsRoot, '`', join(hardline, config.value.split(/\n/g)), '`']),
+      concat([markAsRoot, '`', join(hardline, info.value.split(/\n/g)), '`']),
     );
   }
 };
