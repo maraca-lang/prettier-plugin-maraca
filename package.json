@@ -1,6 +1,6 @@
 {
   "name": "prettier-plugin-maraca",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": "lib/index.js",
   "license": "MIT",
   "scripts": {
@@ -14,11 +14,11 @@
     "trailingComma": "all"
   },
   "dependencies": {
-    "maraca": "^0.3.0",
+    "maraca": "^0.4.1",
     "prettier": "^1.16.4"
   },
   "devDependencies": {
     "rimraf": "^2.6.3",
-    "typescript": "^3.3.1"
+    "typescript": "^3.3.3"
   }
 }

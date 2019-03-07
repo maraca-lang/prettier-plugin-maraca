@@ -8,9 +8,9 @@ const code = `
     there\`], [:a, href: about, About],,
     "1 + ?"$1
   ],
-  (#url) [
+  (#url   | 1) [
     : [:p, Hi'!, " "],
-    about: [:p, About'!],   => [:p, "Not found..."],,
+    about: [:p, About.'!],   => [:p, "Not found..."],,
   ]
 ]
 `;

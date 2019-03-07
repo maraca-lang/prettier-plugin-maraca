@@ -60,10 +60,10 @@ inherits@2:
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
   integrity sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
 
-maraca@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.3.0.tgz#473cbfc747b264d36be5d4f859f123954769a0a6"
-  integrity sha512-uE9lv8Z5fEun6kPJMP9N0zTaIRbjop9fsOzOSEu2e+N0CpzFBEqBhRdKHYzQL4X56t83/NApfRJAkd3eg9RI7Q==
+maraca@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.4.1.tgz#8a962ecb2cd48d90017cd70ac14855e6cb7a738c"
+  integrity sha512-YP7uZsXJ7eOen/GIlIRSORzbc719QIKISudzQqkUvwbnKyHCZJCkGYc/5bWmEsyQkNZSwCwK6b+Q4oANiEUFfw==
   dependencies:
     moo "^0.5.0"
     nearley "^2.16.0"
@@ -143,10 +143,10 @@ semver@^5.4.1:
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.6.0.tgz#7e74256fbaa49c75aa7c7a205cc22799cac80004"
   integrity sha512-RS9R6R35NYgQn++fkDWaOmqGoj4Ek9gGs+DPxNUZKuwE183xjJroKvyo1IzVFeXvUrvmALy6FWD5xrdJT25gMg==
 
-typescript@^3.3.1:
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.3.1.tgz#6de14e1db4b8a006ac535e482c8ba018c55f750b"
-  integrity sha512-cTmIDFW7O0IHbn1DPYjkiebHxwtCMU+eTy30ZtJNBPF9j2O1ITu5XH2YnBeVRKWHqF+3JQwWJv0Q0aUgX8W7IA==
+typescript@^3.3.3:
+  version "3.3.3333"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.3.3333.tgz#171b2c5af66c59e9431199117a3bcadc66fdcfd6"
+  integrity sha512-JjSKsAfuHBE/fB2oZ8NxtRTk5iGcg6hkYXMnZ3Wc+b2RSqejEqTaem11mHASMnFilHrax3sLK0GDzcJrekZYLw==
 
 wrappy@1:
   version "1.0.2"

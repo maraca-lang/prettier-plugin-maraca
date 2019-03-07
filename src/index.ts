@@ -39,7 +39,7 @@ const printConfig = (
   print,
   { type, nodes = [] as any[], info = {} as any },
 ) => {
-  if (type === 'other') {
+  if (type === 'func') {
     const [key, value] = nodes;
     if (info.map) {
       if (key && value) {
