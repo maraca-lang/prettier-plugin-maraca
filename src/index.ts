@@ -47,10 +47,10 @@ const printConfig = (
           concat([
             group(
               concat([
-                path.call(print, 'nodes', '0'),
+                path.call(print, 'nodes', '1'),
                 '=>',
                 line,
-                path.call(print, 'nodes', '1'),
+                path.call(print, 'nodes', '0'),
                 '=>',
               ]),
             ),
@@ -123,12 +123,11 @@ const printConfig = (
       ]),
     );
   }
-  if (type === 'copy') {
+  if (type === 'push') {
     return group(
       concat([
-        path.call(print, 'nodes', '1'),
-        ';',
-        indentBreak(line, path.call(print, 'nodes', '0')),
+        path.call(print, 'nodes', '0'),
+        indentBreak(line, '->', line, path.call(print, 'nodes', '1')),
       ]),
     );
   }
@@ -145,7 +144,10 @@ const printConfig = (
       return group(concat([info.func, path.call(print, 'nodes', '0')]));
     }
     return group(
-      join(concat([line, info.func, line]), path.map(print, 'nodes')),
+      concat([
+        path.call(print, 'nodes', '0'),
+        indentBreak(line, info.func, line, path.call(print, 'nodes', '1')),
+      ]),
     );
   }
   if (type === 'library') {
