@@ -141,7 +141,13 @@ const printConfig = (
   }
   if (type === 'core') {
     if (nodes.length === 1) {
-      return group(concat([info.func, path.call(print, 'nodes', '0')]));
+      return group(
+        concat([
+          info.func,
+          ...(info.func === '!' ? [line] : []),
+          path.call(print, 'nodes', '0'),
+        ]),
+      );
     }
     return group(
       concat([
@@ -156,6 +162,7 @@ const printConfig = (
   if (type === 'list') {
     const items = [] as any[];
     let current = [] as any;
+    let multi = null as any;
     let lines = 0;
     path.each(p => {
       const c = p.getValue();
@@ -163,24 +170,27 @@ const printConfig = (
         current.push(',', ifBreak('', ' '));
         lines++;
       } else {
-        if (current.length > 0) {
-          items.push(concat(current));
-        }
-        current = [
-          ...Array.from({ length: lines }).map(() => softline),
-          print(p),
-        ];
+        if (current.length > 0) items.push(concat(current));
+        current = [...Array.from({ length: lines }).map(() => softline)];
         lines = 0;
+        if (c.info && c.info.first) multi = [markAsRoot, '"'];
+        if (multi) multi.push(print(p));
+        else current.push(print(p));
+        if (c.info && c.info.last) {
+          multi.push('"');
+          current.push(concat(multi));
+          multi = null;
+        }
       }
     }, 'nodes');
-    items.push(concat(current));
+    if (current.length > 0) items.push(concat(current));
     return group(
       concat([
         info.bracket,
         indent(concat([softline, join(concat([',', line]), items)])),
         ifBreak(',', ''),
         softline,
-        { '[': ']', '(': ')', '{': '}' }[info.bracket],
+        { '[': ']', '(': ')', '{': '}', '<': '/>' }[info.bracket],
       ]),
     );
   }
@@ -202,6 +212,13 @@ const printConfig = (
     );
   }
   if (type === 'value') {
+    if (info.multi) {
+      const result = `${info.split ? '>' : ''}${info.value.replace(
+        /([<>"\\])/g,
+        (_, m) => `\\${m}`,
+      )}`;
+      return join(hardline, result.split(/\n/g));
+    }
     if (info.value.length === 1 && !/[a-zA-Z0-9]/.test(info.value)) {
       return info.value === ' ' ? '_' : `'${info.value}`;
     }
