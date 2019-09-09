@@ -9,7 +9,7 @@ const code = `
     "1 + ?"$1
   ],
   (#url   | 1) [
-    : [:p, Hi'!, " "],
+    ~: [:p, Hi'!, " "],
     about: [:p, About.'!],   => [:p, "Not found..."],,
   ]
 ]

@@ -3,6 +3,7 @@ import { parse } from 'maraca';
 
 const {
   concat,
+  fill,
   group,
   hardline,
   ifBreak,
@@ -23,9 +24,32 @@ export const languages = [
   },
 ];
 
+const checkIdNode = node => {
+  if (!node || !node.nodes) return node;
+  if (
+    node.type === 'list' &&
+    node.info.bracket === '[' &&
+    node.nodes.length === 1 &&
+    node.nodes[0].type === 'func' &&
+    !node.nodes[0].info &&
+    !node.nodes[0].nodes[0] &&
+    node.nodes[0].nodes[1] &&
+    node.nodes[0].nodes[1].type === 'value' &&
+    node.nodes[0].nodes[2] &&
+    node.nodes[0].nodes[2].type === 'combine' &&
+    node.nodes[0].nodes[2].nodes[0].type === 'value' &&
+    node.nodes[0].nodes[2].nodes[0].info.value ===
+      node.nodes[0].nodes[1].info.value &&
+    node.nodes[0].nodes[2].nodes[1].type === 'context'
+  ) {
+    return { ...node, idNode: true };
+  }
+  return { ...node, nodes: node.nodes.map(checkIdNode) };
+};
+
 export const parsers = {
   maraca: {
-    parse,
+    parse: s => checkIdNode(parse(s)),
     astFormat: 'maraca',
     locStart: node => node.start,
     locEnd: node => node.end,
@@ -34,11 +58,35 @@ export const parsers = {
 
 const indentBreak = (...docs) => ifBreak(indent(concat(docs)), concat(docs));
 
+const printString = (quote, value) =>
+  group(
+    concat([
+      markAsRoot,
+      quote,
+      join(
+        concat([hardline, hardline]),
+        value
+          .split(/\s*\n\s*\n\s*/g)
+          .filter(s => s)
+          .map(s =>
+            fill(
+              s
+                .split(/\s+/g)
+                .reduce((res, a) => [...res, line, a], [])
+                .slice(1),
+            ),
+          ),
+      ),
+      quote,
+    ]),
+  );
+
 const printConfig = (
   path,
   print,
-  { type, nodes = [] as any[], info = {} as any },
+  { type, nodes = [] as any[], info = {} as any, idNode },
 ) => {
+  if (idNode) return '~';
   if (type === 'func') {
     const [key, value] = nodes;
     if (info.map) {
@@ -83,20 +131,6 @@ const printConfig = (
     );
   }
   if (type === 'assign') {
-    if (info.unpack) {
-      if (nodes.length === 1) {
-        return group(
-          concat(['::', indentBreak(line, path.call(print, 'nodes', '0'))]),
-        );
-      }
-      return group(
-        concat([
-          path.call(print, 'nodes', '1'),
-          '::',
-          indentBreak(line, path.call(print, 'nodes', '0')),
-        ]),
-      );
-    }
     if (nodes[1].type === 'nil') {
       return group(
         concat([':', indentBreak(line, path.call(print, 'nodes', '0'))]),
@@ -141,13 +175,7 @@ const printConfig = (
   }
   if (type === 'core') {
     if (nodes.length === 1) {
-      return group(
-        concat([
-          info.func,
-          ...(info.func === '!' ? [line] : []),
-          path.call(print, 'nodes', '0'),
-        ]),
-      );
+      return group(concat([info.func, path.call(print, 'nodes', '0')]));
     }
     return group(
       concat([
@@ -174,11 +202,21 @@ const printConfig = (
         current = [...Array.from({ length: lines }).map(() => softline)];
         lines = 0;
         if (c.info && c.info.first) multi = [markAsRoot, '"'];
-        if (multi) multi.push(print(p));
-        else current.push(print(p));
+        if (multi) {
+          const printed = print(p);
+          if (Array.isArray(printed)) {
+            multi.push(...printed);
+          } else {
+            multi[multi.length - 1] = group(
+              concat([multi[multi.length - 1], printed]),
+            );
+          }
+        } else {
+          current.push(print(p));
+        }
         if (c.info && c.info.last) {
           multi.push('"');
-          current.push(concat(multi));
+          current.push(fill(multi));
           multi = null;
         }
       }
@@ -217,7 +255,21 @@ const printConfig = (
         /([<>"\\])/g,
         (_, m) => `\\${m}`,
       )}`;
-      return join(hardline, result.split(/\n/g));
+      return result
+        .split(/\s*\n\s*\n\s*/g)
+        .reduce(
+          (res, a) => [
+            ...res,
+            hardline,
+            hardline,
+            ...a
+              .split(/\s+/g)
+              .reduce((res, b) => [...res, line, b], [] as any[])
+              .slice(1),
+          ],
+          [] as any[],
+        )
+        .slice(2);
     }
     if (info.value.length === 1 && !/[a-zA-Z0-9]/.test(info.value)) {
       return info.value === ' ' ? '_' : `'${info.value}`;
@@ -225,22 +277,11 @@ const printConfig = (
     if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(info.value)) {
       return info.value;
     }
-    return group(
-      concat([
-        markAsRoot,
-        '"',
-        join(hardline, info.value.replace(/"/g, '""').split(/\n/g)),
-        '"',
-      ]),
-    );
+    return printString('"', info.value);
   }
   if (type === 'nil') return '""';
   if (type === 'context') return '?';
-  if (type === 'comment') {
-    return group(
-      concat([markAsRoot, '`', join(hardline, info.value.split(/\n/g)), '`']),
-    );
-  }
+  if (type === 'comment') return printString('`', info.value);
 };
 
 export const printers = {
