@@ -10,7 +10,6 @@ const {
   indent,
   join,
   line,
-  markAsRoot,
   softline,
 } = prettier.doc.builders;
 
@@ -56,37 +55,52 @@ export const parsers = {
   },
 };
 
+const splitItems = (items, test) => {
+  const temp = [...items];
+  const result = [] as any[];
+  let i = 0;
+  while (i !== -1) {
+    i = temp.findIndex(test);
+    const chunk = temp.splice(0, i === -1 ? temp.length : i + 1);
+    if (i !== -1) chunk.pop();
+    result.push(chunk);
+  }
+  return result;
+};
+
 const indentBreak = (...docs) => ifBreak(indent(concat(docs)), concat(docs));
 
-const printString = (quote, value) =>
-  group(
+const printString = (quote, value) => {
+  return group(
     concat([
-      markAsRoot,
       quote,
       join(
-        concat([hardline, hardline]),
-        value
-          .split(/\s*\n\s*\n\s*/g)
-          .filter(s => s)
-          .map(s =>
-            fill(
-              s
-                .split(/\s+/g)
-                .reduce((res, a) => [...res, line, a], [])
-                .slice(1),
-            ),
-          ),
+        hardline,
+        value.split(/\n/g).map(t => {
+          const parts = t.split(/^(\s*)/g);
+          const [, indent, rest] =
+            parts.length < 3 ? ['', '', ...parts, ''] : parts;
+          return fill([
+            indent,
+            '',
+            ...rest
+              .split(/ /g)
+              .reduce((res, a) => [...res, line, a], [])
+              .slice(1),
+          ]);
+        }),
       ),
       quote,
     ]),
   );
+};
 
 const printConfig = (
   path,
   print,
   { type, nodes = [] as any[], info = {} as any, idNode },
 ) => {
-  if (idNode) return '~';
+  if (type === 'identity' || idNode) return '~';
   if (type === 'func') {
     const [key, value] = nodes;
     if (info.map) {
@@ -189,43 +203,58 @@ const printConfig = (
   }
   if (type === 'list') {
     const items = [] as any[];
-    let current = [] as any;
     let multi = null as any;
     let lines = 0;
+    const addItem = item => {
+      items.push(
+        concat([
+          ...Array.from({ length: lines }).map(() => softline),
+          ...(items.length !== 0 ? [line] : []),
+          item,
+        ]),
+      );
+      lines = 0;
+    };
     path.each(p => {
       const c = p.getValue();
       if (c.type === 'nil') {
-        current.push(',', ifBreak('', ' '));
+        items.push(ifBreak('', ' '));
         lines++;
       } else {
-        if (current.length > 0) items.push(concat(current));
-        current = [...Array.from({ length: lines }).map(() => softline)];
-        lines = 0;
-        if (c.info && c.info.first) multi = [markAsRoot, '"'];
+        if (c.info && c.info.first) multi = ['"'];
         if (multi) {
           const printed = print(p);
           if (Array.isArray(printed)) {
-            multi.push(...printed);
+            const [indent, ...rest] = printed;
+            multi.push(indent && line, ...rest);
           } else {
-            multi[multi.length - 1] = group(
-              concat([multi[multi.length - 1], printed]),
-            );
+            multi.push(printed);
           }
         } else {
-          current.push(print(p));
+          addItem(print(p));
         }
         if (c.info && c.info.last) {
           multi.push('"');
-          current.push(fill(multi));
+          addItem(
+            join(
+              hardline,
+              splitItems(multi, x => x === hardline).map(x =>
+                fill(
+                  splitItems(x, y => y === line)
+                    .reduce((res, x) => [...res, line, concat(x)], [])
+                    .slice(1),
+                ),
+              ),
+            ),
+          );
           multi = null;
         }
       }
     }, 'nodes');
-    if (current.length > 0) items.push(concat(current));
     return group(
       concat([
         info.bracket,
-        indent(concat([softline, join(concat([',', line]), items)])),
+        indent(concat([softline, join(',', items)])),
         ifBreak(',', ''),
         softline,
         { '[': ']', '(': ')', '{': '}', '<': '/>' }[info.bracket],
@@ -250,34 +279,41 @@ const printConfig = (
     );
   }
   if (type === 'value') {
+    if (info.value === '\n') return '\\\n';
+    const s = info.value
+      .replace(/\n\n/g, '￿')
+      .replace(/([<>"\\\n])/g, (_, m) => `\\${m}`)
+      .replace(/￿/g, '\n\n');
     if (info.multi) {
-      const result = `${info.split ? '>' : ''}${info.value.replace(
-        /([<>"\\])/g,
-        (_, m) => `\\${m}`,
-      )}`;
+      const result = `${info.split ? '>' : ''}${s}`;
       return result
-        .split(/\s*\n\s*\n\s*/g)
+        .split(/\n/g)
         .reduce(
-          (res, a) => [
-            ...res,
-            hardline,
-            hardline,
-            ...a
-              .split(/\s+/g)
-              .reduce((res, b) => [...res, line, b], [] as any[])
-              .slice(1),
-          ],
+          (res, t) => {
+            const parts = t.split(/^(\s*)/g);
+            const [, indent, rest] =
+              parts.length < 3 ? ['', '', ...parts, ''] : parts;
+            return [
+              ...res,
+              hardline,
+              indent,
+              ...rest
+                .split(/ /g)
+                .reduce((res, a) => [...res, line, a], [] as any[])
+                .slice(1),
+            ];
+          },
           [] as any[],
         )
-        .slice(2);
+        .slice(1);
     }
-    if (info.value.length === 1 && !/[a-zA-Z0-9]/.test(info.value)) {
-      return info.value === ' ' ? '_' : `'${info.value}`;
+    if (s.length === 1 && !/[a-zA-Z0-9]/.test(s)) {
+      return s === ' ' ? '_' : `\\${s}`;
     }
-    if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(info.value)) {
-      return info.value;
+    if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(s)) {
+      return s;
     }
-    return printString('"', info.value);
+    return printString('"', s);
   }
   if (type === 'nil') return '""';
   if (type === 'context') return '?';
