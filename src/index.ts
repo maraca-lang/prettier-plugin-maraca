@@ -221,7 +221,7 @@ const printConfig = (
         items.push(ifBreak('', ' '));
         lines++;
       } else {
-        if (c.info && c.info.first) multi = ['"'];
+        if (c.info && c.info.first) multi = ["'"];
         if (multi) {
           const printed = print(p);
           if (Array.isArray(printed)) {
@@ -234,7 +234,7 @@ const printConfig = (
           addItem(print(p));
         }
         if (c.info && c.info.last) {
-          multi.push('"');
+          multi.push("'");
           addItem(
             join(
               hardline,
@@ -254,8 +254,8 @@ const printConfig = (
     return group(
       concat([
         info.bracket,
-        indent(concat([softline, join(',', items)])),
-        ifBreak(',', ''),
+        indent(concat([softline, join(group(concat([softline, ','])), items)])),
+        ifBreak(group(concat([softline, ','])), ''),
         softline,
         { '[': ']', '(': ')', '{': '}', '<': '/>' }[info.bracket],
       ]),
@@ -279,41 +279,51 @@ const printConfig = (
     );
   }
   if (type === 'value') {
+    if (!info.value) return '""';
     if (info.value === '\n') return '\\\n';
+    if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(info.value)) {
+      return info.value;
+    }
+    if (info.split === undefined) {
+      if (info.value.length === 1 && !/[a-zA-Z0-9]/.test(info.value)) {
+        return info.value === ' ' ? '_' : `\\${info.value}`;
+      }
+      return group(
+        concat([
+          '"',
+          join(
+            hardline,
+            info.value.replace(/(["\\])/g, (_, m) => `\\${m}`).split(/\n/g),
+          ),
+          '"',
+        ]),
+      );
+    }
     const s = info.value
       .replace(/\n\n/g, '￿')
-      .replace(/([<>"\\\n])/g, (_, m) => `\\${m}`)
+      .replace(/([<>'\\\n])/g, (_, m) => `\\${m}`)
       .replace(/￿/g, '\n\n');
-    if (info.multi) {
-      const result = `${info.split ? '>' : ''}${s}`;
-      return result
-        .split(/\n/g)
-        .reduce(
-          (res, t) => {
-            const parts = t.split(/^(\s*)/g);
-            const [, indent, rest] =
-              parts.length < 3 ? ['', '', ...parts, ''] : parts;
-            return [
-              ...res,
-              hardline,
-              indent,
-              ...rest
-                .split(/ /g)
-                .reduce((res, a) => [...res, line, a], [] as any[])
-                .slice(1),
-            ];
-          },
-          [] as any[],
-        )
-        .slice(1);
-    }
-    if (s.length === 1 && !/[a-zA-Z0-9]/.test(s)) {
-      return s === ' ' ? '_' : `\\${s}`;
-    }
-    if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(s)) {
-      return s;
-    }
-    return printString('"', s);
+    const result = `${info.split ? '>' : ''}${s}`;
+    return result
+      .split(/\n/g)
+      .reduce(
+        (res, t) => {
+          const parts = t.split(/^(\s*)/g);
+          const [, indent, rest] =
+            parts.length < 3 ? ['', '', ...parts, ''] : parts;
+          return [
+            ...res,
+            hardline,
+            indent,
+            ...rest
+              .split(/ /g)
+              .reduce((res, a) => [...res, line, a], [] as any[])
+              .slice(1),
+          ];
+        },
+        [] as any[],
+      )
+      .slice(1);
   }
   if (type === 'nil') return '""';
   if (type === 'context') return '?';
