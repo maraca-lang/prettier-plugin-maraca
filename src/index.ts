@@ -70,31 +70,6 @@ const splitItems = (items, test) => {
 
 const indentBreak = (...docs) => ifBreak(indent(concat(docs)), concat(docs));
 
-const printString = (quote, value) => {
-  return group(
-    concat([
-      quote,
-      join(
-        hardline,
-        value.split(/\n/g).map(t => {
-          const parts = t.split(/^(\s*)/g);
-          const [, indent, rest] =
-            parts.length < 3 ? ['', '', ...parts, ''] : parts;
-          return fill([
-            indent,
-            '',
-            ...rest
-              .split(/ /g)
-              .reduce((res, a) => [...res, line, a], [])
-              .slice(1),
-          ]);
-        }),
-      ),
-      quote,
-    ]),
-  );
-};
-
 const printConfig = (
   path,
   print,
@@ -241,7 +216,7 @@ const printConfig = (
               splitItems(multi, x => x === hardline).map(x =>
                 fill(
                   splitItems(x, y => y === line)
-                    .reduce((res, x) => [...res, line, concat(x)], [])
+                    .reduce((res, x) => [...res, line, group(concat(x))], [])
                     .slice(1),
                 ),
               ),
@@ -262,19 +237,24 @@ const printConfig = (
     );
   }
   if (type === 'combine') {
+    const items = path
+      .map(
+        (p, i) => [
+          ...(i !== 0 && info.dot ? [softline, '.'] : []),
+          print(p),
+          ...(info.space && info.space[i] ? [line] : []),
+        ],
+        'nodes',
+      )
+      .reduce((res, x) => [...res, ...x], []);
     return group(
-      indent(
-        concat(
-          path.map(
-            (p, i) =>
-              concat([
-                ...(i !== 0 && info.dot ? [softline, '.'] : []),
-                print(p),
-                info.space && info.space[i] ? line : '',
-              ]),
-            'nodes',
-          ),
-        ),
+      fill(
+        splitItems(items, x => x === (info.dot ? softline : line))
+          .reduce(
+            (res, x) => [...res, info.dot ? softline : line, group(concat(x))],
+            [],
+          )
+          .slice(1),
       ),
     );
   }
@@ -327,7 +307,25 @@ const printConfig = (
   }
   if (type === 'nil') return '""';
   if (type === 'context') return '?';
-  if (type === 'comment') return printString('`', info.value);
+  if (type === 'comment') {
+    return group(
+      concat([
+        '`',
+        join(
+          hardline,
+          info.value.split(/\n/g).map(t =>
+            fill(
+              t
+                .split(/ /g)
+                .reduce((res, a) => [...res, line, a], [])
+                .slice(1),
+            ),
+          ),
+        ),
+        '`',
+      ]),
+    );
+  }
 };
 
 export const printers = {

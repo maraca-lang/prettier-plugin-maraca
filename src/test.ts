@@ -4,7 +4,7 @@ const code = `
 [
   @@ 100,
   [
-    [:a, href: "", Home, \`hello
+    [:testing, href: "", Home, \`hello
     there\`], [:a, href: about, About],,
     "1 + ?"$1
   ],
