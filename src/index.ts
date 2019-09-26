@@ -237,13 +237,19 @@ const printConfig = (
     );
   }
   if (type === 'combine') {
+    if (info.dot) {
+      return group(
+        concat(
+          path.map(
+            (p, i) => concat([...(i !== 0 && [softline, '.']), print(p)]),
+            'nodes',
+          ),
+        ),
+      );
+    }
     const items = path
       .map(
-        (p, i) => [
-          ...(i !== 0 && info.dot ? [softline, '.'] : []),
-          print(p),
-          ...(info.space && info.space[i] ? [line] : []),
-        ],
+        (p, i) => [print(p), ...(info.space && info.space[i] ? [line] : [])],
         'nodes',
       )
       .reduce((res, x) => [...res, ...x], []);
@@ -255,15 +261,8 @@ const printConfig = (
           x => x.type === 'concat' && x.parts[1] === hardline,
         ).map(x =>
           fill(
-            splitItems(x, y => y === (info.dot ? softline : line))
-              .reduce(
-                (res, y) => [
-                  ...res,
-                  info.dot ? softline : line,
-                  group(concat(y)),
-                ],
-                [],
-              )
+            splitItems(x, y => y === line)
+              .reduce((res, y) => [...res, line, group(concat(y))], [])
               .slice(1),
           ),
         ),
