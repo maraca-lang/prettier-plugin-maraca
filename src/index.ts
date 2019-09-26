@@ -248,23 +248,35 @@ const printConfig = (
       )
       .reduce((res, x) => [...res, ...x], []);
     return group(
-      fill(
-        splitItems(items, x => x === (info.dot ? softline : line))
-          .reduce(
-            (res, x) => [...res, info.dot ? softline : line, group(concat(x))],
-            [],
-          )
-          .slice(1),
+      join(
+        concat([group(concat([line, '\\'])), hardline]),
+        splitItems(
+          items,
+          x => x.type === 'concat' && x.parts[1] === hardline,
+        ).map(x =>
+          fill(
+            splitItems(x, y => y === (info.dot ? softline : line))
+              .reduce(
+                (res, y) => [
+                  ...res,
+                  info.dot ? softline : line,
+                  group(concat(y)),
+                ],
+                [],
+              )
+              .slice(1),
+          ),
+        ),
       ),
     );
   }
   if (type === 'value') {
-    if (!info.value) return '""';
-    if (info.value === '\n') return '\\\n';
-    if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(info.value)) {
-      return info.value;
-    }
     if (info.split === undefined) {
+      if (!info.value) return '""';
+      if (info.value === '\n') return concat(['\\', hardline]);
+      if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(info.value)) {
+        return info.value;
+      }
       if (info.value.length === 1 && !/[a-zA-Z0-9]/.test(info.value)) {
         return info.value === ' ' ? '_' : `\\${info.value}`;
       }
