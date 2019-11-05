@@ -23,32 +23,9 @@ export const languages = [
   },
 ];
 
-const checkIdNode = node => {
-  if (!node || !node.nodes) return node;
-  if (
-    node.type === 'list' &&
-    node.info.bracket === '[' &&
-    node.nodes.length === 1 &&
-    node.nodes[0].type === 'func' &&
-    !node.nodes[0].info &&
-    !node.nodes[0].nodes[0] &&
-    node.nodes[0].nodes[1] &&
-    node.nodes[0].nodes[1].type === 'value' &&
-    node.nodes[0].nodes[2] &&
-    node.nodes[0].nodes[2].type === 'combine' &&
-    node.nodes[0].nodes[2].nodes[0].type === 'value' &&
-    node.nodes[0].nodes[2].nodes[0].info.value ===
-      node.nodes[0].nodes[1].info.value &&
-    node.nodes[0].nodes[2].nodes[1].type === 'context'
-  ) {
-    return { ...node, idNode: true };
-  }
-  return { ...node, nodes: node.nodes.map(checkIdNode) };
-};
-
 export const parsers = {
   maraca: {
-    parse: s => checkIdNode(parse(s)),
+    parse: s => parse(s),
     astFormat: 'maraca',
     locStart: node => node.start,
     locEnd: node => node.end,
@@ -73,9 +50,8 @@ const indentBreak = (...docs) => ifBreak(indent(concat(docs)), concat(docs));
 const printConfig = (
   path,
   print,
-  { type, nodes = [] as any[], info = {} as any, idNode },
+  { type, nodes = [] as any[], info = {} as any },
 ) => {
-  if (type === 'identity' || idNode) return '~';
   if (type === 'func') {
     const [key, value] = nodes;
     if (info.map) {
@@ -91,7 +67,7 @@ const printConfig = (
                 '=>',
               ]),
             ),
-            indentBreak(line, path.call(print, 'nodes', '2')),
+            indentBreak(line, path.call(print, 'info', 'body')),
           ]),
         );
       }
@@ -99,30 +75,38 @@ const printConfig = (
         return group(
           concat([
             concat([path.call(print, 'nodes', '1'), '=>>']),
-            indentBreak(line, path.call(print, 'nodes', '2')),
+            indentBreak(line, path.call(print, 'info', 'body')),
           ]),
         );
       }
       return group(
-        concat(['=>>', indentBreak(line, path.call(print, 'nodes', '2'))]),
+        concat(['=>>', indentBreak(line, path.call(print, 'info', 'body'))]),
       );
     }
     if (value) {
       return group(
         concat([
           concat([path.call(print, 'nodes', '1'), '=>']),
-          indentBreak(line, path.call(print, 'nodes', '2')),
+          indentBreak(line, path.call(print, 'info', 'body')),
         ]),
       );
     }
     return group(
-      concat(['=>', indentBreak(line, path.call(print, 'nodes', '2'))]),
+      concat(['=>', indentBreak(line, path.call(print, 'info', 'body'))]),
     );
   }
   if (type === 'assign') {
-    if (nodes[1].type === 'nil') {
+    if (!nodes[1]) {
       return group(
         concat([':', indentBreak(line, path.call(print, 'nodes', '0'))]),
+      );
+    }
+    if (nodes[0].type === 'nil' && nodes[1].type === 'nil') {
+      return ':';
+    }
+    if (nodes[1].type === 'nil') {
+      return group(
+        concat(['"":', indentBreak(line, path.call(print, 'nodes', '0'))]),
       );
     }
     if (nodes[0].type === 'nil') {
@@ -146,11 +130,16 @@ const printConfig = (
       ]),
     );
   }
-  if (type === 'push') {
+  if (['push', 'eval', 'trigger'].includes(type)) {
     return group(
       concat([
         path.call(print, 'nodes', '0'),
-        indentBreak(line, '->', line, path.call(print, 'nodes', '1')),
+        indentBreak(
+          line,
+          { push: '->', eval: '$', trigger: '|' }[type],
+          line,
+          path.call(print, 'nodes', '1'),
+        ),
       ]),
     );
   }
@@ -162,7 +151,7 @@ const printConfig = (
       ]),
     );
   }
-  if (type === 'core') {
+  if (type === 'map') {
     if (nodes.length === 1) {
       return group(concat([info.func, path.call(print, 'nodes', '0')]));
     }
