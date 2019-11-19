@@ -2,7 +2,6 @@ import * as prettier from 'prettier/standalone';
 import { parse } from 'maraca';
 
 const {
-  breakParent,
   concat,
   fill,
   group,
@@ -218,7 +217,6 @@ const printConfig = (
     }, 'nodes');
     return group(
       concat([
-        ...(!path.getParentNode() ? [breakParent] : []),
         info.bracket,
         indent(concat([softline, join(group(concat([softline, ','])), items)])),
         ifBreak(group(concat([softline, ','])), ''),
