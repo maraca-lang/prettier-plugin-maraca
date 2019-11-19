@@ -55,9 +55,9 @@ es6-symbol@^3.1.0, es6-symbol@^3.1.1, es6-symbol@~3.1.2:
     ext "^1.1.2"
 
 ext@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/ext/-/ext-1.1.2.tgz#d1d216c83641bb4cb7684622b063cff44a19ce35"
-  integrity sha512-/KLjJdTNyDepCihrk4HQt57nAE1IRCEo5jUt+WgWGCr1oARhibDvmI2DMcSNWood1T9AUWwq+jaV1wvRqaXfnA==
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/ext/-/ext-1.2.0.tgz#8dd8d2dd21bcced3045be09621fa0cbf73908ba4"
+  integrity sha512-0ccUQK/9e3NreLFg6K6np8aPyRgwycx+oFGtfx1dSp7Wj00Ozw9r05FgBRlzjf2XBM7LAzwgLyDscRrtSU91hA==
   dependencies:
     type "^2.0.0"
 
@@ -67,9 +67,9 @@ fs.realpath@^1.0.0:
   integrity sha1-FQStJSMVjKpA20onh8sBQRmU6k8=
 
 glob@^7.1.3:
-  version "7.1.5"
-  resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.5.tgz#6714c69bee20f3c3e64c4dd905553e532b40cdc0"
-  integrity sha512-J9dlskqUXK1OeTOYBEn5s8aMukWMwWfs+rPTn/jn50Ux4MNXVhubL1wu/j2t+H4NVI+cXEcCaYellqaPVGXNqQ==
+  version "7.1.6"
+  resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.6.tgz#141f33b81a7c2492e125594307480c46679278a6"
+  integrity sha512-LwaxwyZ72Lk7vZINtNNrywX0ZuLyStrdDtabefZKAY5ZGJhVtgdznluResxNmPitE0SAO+O26sWTHeKSI2wMBA==
   dependencies:
     fs.realpath "^1.0.0"
     inflight "^1.0.4"
@@ -96,10 +96,10 @@ is-buffer@^1.1.4:
   resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-1.1.6.tgz#efaa2ea9daa0d7ab2ea13a97b2b8ad51fefbe8be"
   integrity sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==
 
-maraca@^0.5.3:
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.5.3.tgz#e52b8f1d113215489e1512eb6211b92f98d218b4"
-  integrity sha512-Xhkm8raOYXMJRuLYrdTO3J0aFb0urAcTWQZPOdHRPk/grwrWM3EW2iDj+cB+o36GauqX4VX0E9Q3Ezl/+tIX2g==
+maraca@^0.5.4:
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.5.4.tgz#313695b694f6740baf76df65a9fced95e61f84f0"
+  integrity sha512-2vas0AE9Ybyry0V9zVu2jLVTvy70TskUPWr3j9pXTATGmaKFHFpL6nH6ByUM6y97up6SqRlRjffpI5dnhXRaXA==
   dependencies:
     ohm-js "^0.14.0"
 
@@ -137,10 +137,10 @@ path-is-absolute@^1.0.0:
   resolved "https://registry.yarnpkg.com/path-is-absolute/-/path-is-absolute-1.0.1.tgz#174b9268735534ffbc7ace6bf53a5a9e1b5c5f5f"
   integrity sha1-F0uSaHNVNP+8es5r9TpanhtcX18=
 
-prettier@^1.18.2:
-  version "1.18.2"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.18.2.tgz#6823e7c5900017b4bd3acf46fe9ac4b4d7bda9ea"
-  integrity sha512-OeHeMc0JhFE9idD4ZdtNibzY0+TPHSpSSb9h8FqtP+YnoZZ1sl8Vc9b1sasjfymH3SonAF4QcA2+mzHPhMvIiw==
+prettier@^1.19.1:
+  version "1.19.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.19.1.tgz#f7d7f5ff8a9cd872a7be4ca142095956a60797cb"
+  integrity sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==
 
 rimraf@^3.0.0:
   version "3.0.0"

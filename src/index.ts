@@ -2,6 +2,7 @@ import * as prettier from 'prettier/standalone';
 import { parse } from 'maraca';
 
 const {
+  breakParent,
   concat,
   fill,
   group,
@@ -217,6 +218,7 @@ const printConfig = (
     }, 'nodes');
     return group(
       concat([
+        ...(!path.getParentNode() ? [breakParent] : []),
         info.bracket,
         indent(concat([softline, join(group(concat([softline, ','])), items)])),
         ifBreak(group(concat([softline, ','])), ''),
@@ -286,23 +288,20 @@ const printConfig = (
     const result = `${info.split ? '>' : ''}${s}`;
     return result
       .split(/\n/g)
-      .reduce(
-        (res, t) => {
-          const parts = t.split(/^(\s*)/g);
-          const [, indent, rest] =
-            parts.length < 3 ? ['', '', ...parts, ''] : parts;
-          return [
-            ...res,
-            hardline,
-            indent,
-            ...rest
-              .split(/ /g)
-              .reduce((res, a) => [...res, line, a], [] as any[])
-              .slice(1),
-          ];
-        },
-        [] as any[],
-      )
+      .reduce((res, t) => {
+        const parts = t.split(/^(\s*)/g);
+        const [, indent, rest] =
+          parts.length < 3 ? ['', '', ...parts, ''] : parts;
+        return [
+          ...res,
+          hardline,
+          indent,
+          ...rest
+            .split(/ /g)
+            .reduce((res, a) => [...res, line, a], [] as any[])
+            .slice(1),
+        ];
+      }, [] as any[])
       .slice(1);
   }
   if (type === 'nil') return '""';
