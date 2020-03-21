@@ -25,10 +25,10 @@ export const languages = [
 
 export const parsers = {
   maraca: {
-    parse: s => parse(s),
+    parse: (s) => parse(s),
     astFormat: 'maraca',
-    locStart: node => node.start,
-    locEnd: node => node.end,
+    locStart: (node) => node.start,
+    locEnd: (node) => node.end,
   },
 };
 
@@ -79,9 +79,12 @@ const printConfig = (
           ]),
         );
       }
-      return group(
-        concat(['=>>', indentBreak(line, path.call(print, 'info', 'body'))]),
-      );
+      if (info.body.type !== 'nil') {
+        return group(
+          concat(['=>>', indentBreak(line, path.call(print, 'info', 'body'))]),
+        );
+      }
+      return group(concat(['=>>', line]));
     }
     if (value) {
       return group(
@@ -143,14 +146,6 @@ const printConfig = (
       ]),
     );
   }
-  if (type === 'interpret') {
-    return group(
-      concat([
-        Array.from({ length: info.level + 1 }).join('@'),
-        path.call(print, 'nodes', '0'),
-      ]),
-    );
-  }
   if (type === 'map') {
     if (nodes.length === 1) {
       return group(concat([info.func, path.call(print, 'nodes', '0')]));
@@ -162,14 +157,11 @@ const printConfig = (
       ]),
     );
   }
-  if (type === 'library') {
-    return group(concat(['#', path.call(print, 'nodes', '0')]));
-  }
-  if (type === 'list') {
+  if (type === 'box') {
     const items = [] as any[];
     let multi = null as any;
     let lines = 0;
-    const addItem = item => {
+    const addItem = (item) => {
       items.push(
         concat([
           ...Array.from({ length: lines }).map(() => softline),
@@ -179,7 +171,7 @@ const printConfig = (
       );
       lines = 0;
     };
-    path.each(p => {
+    path.each((p) => {
       const c = p.getValue();
       if (c.type === 'nil') {
         items.push(ifBreak('', ' '));
@@ -202,9 +194,9 @@ const printConfig = (
           addItem(
             join(
               hardline,
-              splitItems(multi, x => x === hardline).map(x =>
+              splitItems(multi, (x) => x === hardline).map((x) =>
                 fill(
-                  splitItems(x, y => y === line)
+                  splitItems(x, (y) => y === line)
                     .reduce((res, x) => [...res, line, group(concat(x))], [])
                     .slice(1),
                 ),
@@ -247,10 +239,10 @@ const printConfig = (
         concat([group(concat([line, '\\'])), hardline]),
         splitItems(
           items,
-          x => x.type === 'concat' && x.parts[1] === hardline,
-        ).map(x =>
+          (x) => x.type === 'concat' && x.parts[1] === hardline,
+        ).map((x) =>
           fill(
-            splitItems(x, y => y === line)
+            splitItems(x, (y) => y === line)
               .reduce((res, y) => [...res, line, group(concat(y))], [])
               .slice(1),
           ),
@@ -310,7 +302,7 @@ const printConfig = (
         '`',
         join(
           hardline,
-          info.value.split(/\n/g).map(t =>
+          info.value.split(/\n/g).map((t) =>
             fill(
               t
                 .split(/ /g)
