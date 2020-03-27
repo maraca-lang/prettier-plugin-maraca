@@ -96,10 +96,10 @@ is-buffer@^1.1.4:
   resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-1.1.6.tgz#efaa2ea9daa0d7ab2ea13a97b2b8ad51fefbe8be"
   integrity sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==
 
-maraca@^0.6.2:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.6.2.tgz#09c82d57b3f81a97288daca7daac35915323d1a3"
-  integrity sha512-Yys6CrxNHZ8l7DIqw8RRC6Q5TQ5QacZDCncAH4ZxkVbjfmkyHr/fdZDxRa+EaiJK+0K8yYegUjf4T6SIg8cs4A==
+maraca@^0.6.3:
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.6.3.tgz#a3286088b4297054ab288b412a080d967ce5e117"
+  integrity sha512-koesA8/kAedcjP17bn3wbjcm/pFVMIyVxl0mCnwCDX8TxzAnpOD2OkN/OhhFLfVnOLN3bBGgJ7Yd21hiEcaSGA==
   dependencies:
     ohm-js "^0.14.0"
 
@@ -137,10 +137,10 @@ path-is-absolute@^1.0.0:
   resolved "https://registry.yarnpkg.com/path-is-absolute/-/path-is-absolute-1.0.1.tgz#174b9268735534ffbc7ace6bf53a5a9e1b5c5f5f"
   integrity sha1-F0uSaHNVNP+8es5r9TpanhtcX18=
 
-prettier@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.0.0.tgz#9c8fdba0aeae3faf0d9d9391623ac4f9321a4455"
-  integrity sha512-vI55PC+GFLOVtpwr2di1mYhJF36v+kztJov8sx3AmqbfdA+2Dhozxb+3e1hTgoV9lyhnVJFF3Z8GCVeMBOS1bA==
+prettier@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.0.2.tgz#1ba8f3eb92231e769b7fcd7cb73ae1b6b74ade08"
+  integrity sha512-5xJQIPT8BraI7ZnaDwSbu5zLrB6vvi8hVV58yHQ+QK64qrY40dULy0HSRlQ2/2IdzeBpjhDkqdcFBnFeDEMVdg==
 
 rimraf@^3.0.2:
   version "3.0.2"

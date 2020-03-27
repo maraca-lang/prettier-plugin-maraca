@@ -157,7 +157,7 @@ const printConfig = (
       ]),
     );
   }
-  if (type === 'box') {
+  if (type === 'block') {
     const items = [] as any[];
     let multi = null as any;
     let lines = 0;
