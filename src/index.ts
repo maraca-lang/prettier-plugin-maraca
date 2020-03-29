@@ -109,7 +109,7 @@ const printConfig = (
     }
     if (nodes[1].type === 'nil') {
       return group(
-        concat(['"":', indentBreak(line, path.call(print, 'nodes', '0'))]),
+        concat(["'':", indentBreak(line, path.call(print, 'nodes', '0'))]),
       );
     }
     if (nodes[0].type === 'nil') {
@@ -177,7 +177,7 @@ const printConfig = (
         items.push(ifBreak('', ' '));
         lines++;
       } else {
-        if (c.info && c.info.first) multi = ["'"];
+        if (c.info && c.info.first) multi = ['"'];
         if (multi) {
           const printed = print(p);
           if (Array.isArray(printed)) {
@@ -190,7 +190,7 @@ const printConfig = (
           addItem(print(p));
         }
         if (c.info && c.info.last) {
-          multi.push("'");
+          multi.push('"');
           addItem(
             join(
               hardline,
@@ -252,7 +252,7 @@ const printConfig = (
   }
   if (type === 'value') {
     if (info.split === undefined) {
-      if (!info.value) return '""';
+      if (!info.value) return "''";
       if (info.value === '\n') return concat(['\\', hardline]);
       if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(info.value)) {
         return info.value;
@@ -262,18 +262,18 @@ const printConfig = (
       }
       return group(
         concat([
-          '"',
+          "'",
           join(
             hardline,
-            info.value.replace(/(["\\])/g, (_, m) => `\\${m}`).split(/\n/g),
+            info.value.replace(/(['\\])/g, (_, m) => `\\${m}`).split(/\n/g),
           ),
-          '"',
+          "'",
         ]),
       );
     }
     const s = info.value
       .replace(/\n\n/g, '￿')
-      .replace(/([<>'\\\n])/g, (_, m) => `\\${m}`)
+      .replace(/([<>"\\\n])/g, (_, m) => `\\${m}`)
       .replace(/￿/g, '\n\n');
     const result = `${info.split ? '>' : ''}${s}`;
     return result
@@ -294,7 +294,7 @@ const printConfig = (
       }, [] as any[])
       .slice(1);
   }
-  if (type === 'nil') return '""';
+  if (type === 'nil') return "''";
   if (type === 'context') return '?';
   if (type === 'comment') {
     return group(
