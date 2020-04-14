@@ -6,7 +6,7 @@ const code = `
   [
     [:testing, href: '', Home, \`hello
     there\`], [:a, href: about, About],,
-    '1 + ?'$1,
+    1  >> '1 + ?',   >>'2134',
     'one
 two'
   ],
@@ -14,7 +14,10 @@ two'
     : [:p, Hi\\!, ' '],
     about: ['':p, About.\\!],   => [:p, 'Not found...'],,
   ],
-  [: test, "what     about this
+  [: test, "what     about 
+  
+  
+  this     
 < woo: hi  there />"]
 ]
 `;

@@ -133,13 +133,24 @@ const printConfig = (
       ]),
     );
   }
-  if (['push', 'eval', 'trigger'].includes(type)) {
+  if (type === 'eval') {
+    if (nodes.length === 1) {
+      return group(concat(['>>', softline, path.call(print, 'nodes', '0')]));
+    }
+    return group(
+      concat([
+        path.call(print, 'nodes', '1'),
+        indentBreak(softline, '>>', softline, path.call(print, 'nodes', '0')),
+      ]),
+    );
+  }
+  if (['push', 'trigger'].includes(type)) {
     return group(
       concat([
         path.call(print, 'nodes', '0'),
         indentBreak(
           line,
-          { push: '->', eval: '$', trigger: '|' }[type],
+          { push: '->', trigger: '|' }[type],
           line,
           path.call(print, 'nodes', '1'),
         ),
@@ -148,7 +159,13 @@ const printConfig = (
   }
   if (type === 'map') {
     if (nodes.length === 1) {
-      return group(concat([info.func, path.call(print, 'nodes', '0')]));
+      return group(
+        concat([
+          info.func,
+          ...(info.func === '!' ? [line] : []),
+          path.call(print, 'nodes', '0'),
+        ]),
+      );
     }
     return group(
       concat([
