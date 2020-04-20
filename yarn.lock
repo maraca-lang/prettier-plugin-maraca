@@ -96,10 +96,10 @@ is-buffer@^1.1.4:
   resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-1.1.6.tgz#efaa2ea9daa0d7ab2ea13a97b2b8ad51fefbe8be"
   integrity sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==
 
-maraca@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.7.0.tgz#435ca9fe4d27cd89b698197d8e7d9da0c5b75344"
-  integrity sha512-sId3Qy1lPwPoWsCP85j5E6su0bVWyrDLbHDseRMLMDOmhTdZCdqIKrrpELY3a+ROIQX8WVq71YVZ43uwMWo3gw==
+maraca@^0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/maraca/-/maraca-0.7.1.tgz#0dc13fe286b4da530f911305fac684758aa70f50"
+  integrity sha512-p3MsoWMAT8nVcArw3VKj4ngz5SJvVQrpDLzm8PGUysClJMy8MMk1PNil/b89yQr/VQ/AMEFiU8TRj36eQDCciA==
   dependencies:
     ohm-js "^0.14.0"
 

@@ -10,15 +10,15 @@ const code = `
     'one
 two'
   ],
+  [10, 20  ]   +  ,
   (  # 100   | 1) [
     : [:p, Hi\\!, ' '],
     about: ['':p, About.\\!],   => [:p, 'Not found...'],,
   ],
-  [: test, "what     about 
-  
-  
-  this     
-< woo: hi  there />"]
+  [: test, "what     about
+
+  this
+< woo: hi  there />"], **&
 ]
 `;
 console.log(

@@ -268,7 +268,7 @@ const printConfig = (
     );
   }
   if (type === 'value') {
-    if (info.split === undefined) {
+    if (!info.multi) {
       if (!info.value) return "''";
       if (info.value === '\n') return concat(['\\', hardline]);
       if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(info.value)) {
@@ -288,11 +288,10 @@ const printConfig = (
         ]),
       );
     }
-    const s = info.value
+    const result = info.value
       .replace(/\n\n/g, '￿')
       .replace(/([<>"\\\n])/g, (_, m) => `\\${m}`)
       .replace(/￿/g, '\n\n');
-    const result = `${info.split ? '>' : ''}${s}`;
     return result
       .split(/\n/g)
       .reduce((res, t) => {
@@ -332,6 +331,10 @@ const printConfig = (
       ]),
     );
   }
+  if (type === 'error') {
+    return group(concat(path.map((p) => print(p), 'info', 'nodes')));
+  }
+  if (type === 'part') return info.value;
 };
 
 export const printers = {
