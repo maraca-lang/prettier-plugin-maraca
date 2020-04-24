@@ -99,21 +99,25 @@ const printConfig = (
     );
   }
   if (type === 'assign') {
+    const operator = info.pushable ? ':~' : ':';
     if (!nodes[1]) {
       return group(
-        concat([':', indentBreak(line, path.call(print, 'nodes', '0'))]),
+        concat([operator, indentBreak(line, path.call(print, 'nodes', '0'))]),
       );
     }
     if (nodes[0].type === 'nil' && nodes[1].type === 'nil') {
-      return ':';
+      return operator;
     }
     if (nodes[1].type === 'nil') {
       return group(
-        concat(["'':", indentBreak(line, path.call(print, 'nodes', '0'))]),
+        concat([
+          `''${operator}`,
+          indentBreak(line, path.call(print, 'nodes', '0')),
+        ]),
       );
     }
     if (nodes[0].type === 'nil') {
-      return concat([path.call(print, 'nodes', '1'), ': ']);
+      return concat([path.call(print, 'nodes', '1'), `${operator} `]);
     }
     if (nodes[0] === nodes[1]) {
       return concat([path.call(print, 'nodes', '1'), ':=']);
@@ -128,7 +132,7 @@ const printConfig = (
     return group(
       concat([
         path.call(print, 'nodes', '1'),
-        ':',
+        operator,
         indentBreak(line, path.call(print, 'nodes', '0')),
       ]),
     );

@@ -5,7 +5,7 @@ const code = `
   [ =>>  ],
   [
     [:testing, href: '', Home, \`hello
-    there\`], [:a, href: about, About],,
+    there\`], [:a, href:~   about, About],,
     1  >> '1 + ?',   >>'2134',
     'one
 two'
