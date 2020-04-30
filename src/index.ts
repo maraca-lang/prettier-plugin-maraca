@@ -2,6 +2,7 @@ import * as prettier from 'prettier/standalone';
 import { parse } from 'maraca';
 
 const {
+  breakParent,
   concat,
   fill,
   group,
@@ -316,29 +317,14 @@ const printConfig = (
   }
   if (type === 'nil') return "''";
   if (type === 'context') return '?';
-  if (type === 'comment') {
-    return group(
-      concat([
-        '`',
-        join(
-          hardline,
-          info.value.split(/\n/g).map((t) =>
-            fill(
-              t
-                .split(/ /g)
-                .reduce((res, a) => [...res, line, a], [])
-                .slice(1),
-            ),
-          ),
-        ),
-        '`',
-      ]),
-    );
-  }
   if (type === 'error') {
     return group(concat(path.map((p) => print(p), 'info', 'nodes')));
   }
-  if (type === 'part') return info.value;
+  if (type === 'part') {
+    return info.value.includes('\n')
+      ? concat([breakParent, info.value])
+      : info.value;
+  }
 };
 
 export const printers = {
