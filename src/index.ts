@@ -55,6 +55,16 @@ const printConfig = (
 ) => {
   if (type === 'func') {
     const [key, value] = nodes;
+    const bodyValue = indentBreak(line, path.call(print, 'info', 'value'));
+    const body =
+      info.key === true
+        ? bodyValue
+        : indentBreak(
+            line,
+            info.key ? path.call(print, 'info', 'key') : '',
+            ':',
+            bodyValue,
+          );
     if (info.map) {
       if (key && value) {
         return group(
@@ -68,36 +78,26 @@ const printConfig = (
                 '=>',
               ]),
             ),
-            indentBreak(line, path.call(print, 'info', 'body')),
+            body,
           ]),
         );
       }
       if (value) {
         return group(
-          concat([
-            concat([path.call(print, 'nodes', '1'), '=>>']),
-            indentBreak(line, path.call(print, 'info', 'body')),
-          ]),
+          concat([concat([path.call(print, 'nodes', '1'), '=>>']), body]),
         );
       }
-      if (info.body.type !== 'nil') {
-        return group(
-          concat(['=>>', indentBreak(line, path.call(print, 'info', 'body'))]),
-        );
+      if (info.value.type !== 'nil') {
+        return group(concat(['=>>', body]));
       }
       return group(concat(['=>>', line]));
     }
     if (value) {
       return group(
-        concat([
-          concat([path.call(print, 'nodes', '1'), '=>']),
-          indentBreak(line, path.call(print, 'info', 'body')),
-        ]),
+        concat([concat([path.call(print, 'nodes', '1'), '=>']), body]),
       );
     }
-    return group(
-      concat(['=>', indentBreak(line, path.call(print, 'info', 'body'))]),
-    );
+    return group(concat(['=>', body]));
   }
   if (type === 'assign') {
     const operator = info.pushable ? ':~' : ':';
@@ -232,8 +232,13 @@ const printConfig = (
     return group(
       concat([
         info.bracket,
-        indent(concat([softline, join(group(concat([softline, ','])), items)])),
-        ifBreak(group(concat([softline, ','])), ''),
+        indent(
+          concat([
+            softline,
+            join(group(concat([softline, ','])), items),
+            ifBreak(group(concat([softline, ','])), ''),
+          ]),
+        ),
         softline,
         { '[': ']', '(': ')', '{': '}', '<': '/>' }[info.bracket],
       ]),
