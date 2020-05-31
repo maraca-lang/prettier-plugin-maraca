@@ -99,7 +99,7 @@ const printConfig = (
     }
     return group(concat(['=>', body]));
   }
-  if (type === 'assign') {
+  if (type === 'set') {
     const operator = info.pushable ? ':~' : ':';
     if (!nodes[1]) {
       return group(
@@ -122,13 +122,6 @@ const printConfig = (
     }
     if (nodes[0] === nodes[1]) {
       return concat([path.call(print, 'nodes', '1'), ':=']);
-    }
-    if (
-      nodes[0].type === 'combine' &&
-      nodes[0].nodes[0] === nodes[1] &&
-      nodes[0].nodes[1].type === 'context'
-    ) {
-      return concat([path.call(print, 'nodes', '1'), ':=?']);
     }
     return group(
       concat([
@@ -178,6 +171,9 @@ const printConfig = (
         indentBreak(line, info.func, line, path.call(print, 'nodes', '1')),
       ]),
     );
+  }
+  if (type === 'size') {
+    return group(concat(['#', path.call(print, 'nodes', '0')]));
   }
   if (type === 'block') {
     const items = [] as any[];
@@ -245,16 +241,23 @@ const printConfig = (
     );
   }
   if (type === 'combine') {
-    if (info.dot) {
-      return group(
-        concat(
-          path.map(
-            (p, i) => concat([...(i !== 0 && [softline, '.']), print(p)]),
-            'nodes',
-          ),
+    return group(
+      concat(
+        path.map(
+          (p, i) =>
+            concat([
+              ...(i !== 0 && [
+                softline,
+                { 1: '.', 2: '..', 3: '...' }[info.level],
+              ]),
+              print(p),
+            ]),
+          'nodes',
         ),
-      );
-    }
+      ),
+    );
+  }
+  if (type === 'join') {
     const items = path
       .map(
         (p, i) => [print(p), ...(info.space && info.space[i] ? [line] : [])],
@@ -281,10 +284,10 @@ const printConfig = (
     if (!info.multi) {
       if (!info.value) return "''";
       if (info.value === '\n') return concat(['\\', hardline]);
-      if (/^((?:\d+\.\d+)|(?:[a-zA-Z0-9]+))$/.test(info.value)) {
+      if (/^[a-zA-Z0-9]+$/.test(info.value)) {
         return info.value;
       }
-      if (info.value.length === 1 && !/[a-zA-Z0-9]/.test(info.value)) {
+      if (info.value.length === 1) {
         return info.value === ' ' ? '_' : `\\${info.value}`;
       }
       return group(
@@ -320,8 +323,10 @@ const printConfig = (
       }, [] as any[])
       .slice(1);
   }
+  if (type === 'get') {
+    return group(concat(['@', path.call(print, 'nodes', '0')]));
+  }
   if (type === 'nil') return "''";
-  if (type === 'context') return '?';
   if (type === 'error') {
     return group(concat(path.map((p) => print(p), 'info', 'nodes')));
   }
