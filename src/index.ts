@@ -131,6 +131,9 @@ const printConfig = (
       ]),
     );
   }
+  if (type === 'copy') {
+    return concat([path.call(print, 'nodes', '0'), ':@']);
+  }
   if (type === 'eval') {
     if (nodes.length === 1) {
       return group(concat(['>>', softline, path.call(print, 'nodes', '0')]));
