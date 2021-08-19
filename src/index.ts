@@ -49,7 +49,7 @@ const script = `
       >
     >
   >
-  base=<(type bracket func mode params key name multi **content)=>
+  base=<(type bracket func mode params key name **content)=>
     {
       [
         (@type = block)
@@ -137,7 +137,16 @@ const script = `
         <type=fill
           =@multiFill.<
             \\"
-            =<(c)=>>@map.<=@c multi=true>>.@content
+            =<<> (res c)=>>>
+              <
+                =@res
+                =[
+                  (@c.type = block)
+                  <@map.@c>
+                  =>@mapTemplate.@c
+                ]
+              >
+            >.@content
             \\"
           >
         >
@@ -146,13 +155,16 @@ const script = `
         (@type = template)
         <type=fill
           =@multiFill.<
-            [!@multi \\"]
-            =<(c)=>>[@isBlock.@c @base.@c =>@escape.@c]>.@content  
-            [!@multi \\"]
+            \\"
+            =@mapTemplate.@content
+            \\"
           >
         >
       ]
     }
+  >
+  mapTemplate=<(type **content)=>
+    <(c)=>>[@isBlock.@c @base.@c =>@escape.@c]>.@content
   >
   map=<v=>
     {
@@ -218,8 +230,6 @@ export const parsers = {
         }),
       }),
     astFormat: "maraca",
-    // locStart: (node) => node.start,
-    // locEnd: (node) => node.end,
   },
 };
 
