@@ -1,7 +1,8 @@
 import * as prettier from "prettier/standalone";
 import maraca, { fromJs, parse } from "maraca";
 
-const { fill, group, indent, join, line, softline } = prettier.doc.builders;
+const { fill, group, hardline, indent, join, line, softline } =
+  prettier.doc.builders;
 
 export const languages = [
   {
@@ -82,6 +83,20 @@ const script = `
       [
         (@type = merge)
         @set.<key=<type=join sep=\\. =<(k)=>>@map.@k>.@key> op="+=" content=@content>
+      ]
+      [
+        (@type = attrs)
+        @set.<
+          key=@array.<
+            open=\\(
+            close=\\)
+            content=<(p)=>>
+              <@p.rest @p.key [@p.def <\\= @map.(@p.def)>]>
+            >.@key
+          >
+          op=\\=
+          content=@content
+        >
       ]
       [
         (@type = attr)
@@ -178,15 +193,32 @@ const script = `
 }
 `;
 
-const splitString = (str) => [
-  ...(/^\s/.test(str) ? [null] : []),
-  ...str
-    .trim()
-    .split(/\s+/g)
-    .reduce((res, s) => [...res, null, { type: "value", value: s }], [])
-    .slice(1),
-  ...(/\s$/.test(str) ? [null] : []),
-];
+const splitString = (str) =>
+  str === " "
+    ? [null]
+    : [
+        ...(/^ /.test(str) ? [null] : []),
+        ...str
+          .trim()
+          .split(/\n/)
+          .reduce(
+            (res, s) => [
+              ...res,
+              { type: "value", value: "\\" },
+              undefined,
+              ...s
+                .split(/ /g)
+                .reduce(
+                  (res, s) => [...res, null, { type: "value", value: s }],
+                  []
+                )
+                .slice(1),
+            ],
+            []
+          )
+          .slice(2),
+        ...(/ $/.test(str) ? [null] : []),
+      ];
 
 export const parsers = {
   maraca: {
@@ -211,20 +243,22 @@ export const parsers = {
             );
           const result = [[]];
           for (const i of items) {
-            if (i === null) result.push([]);
+            if (i === undefined) result.push(fromJs({ type: "hardline" }), []);
+            else if (i === null) result.push(fromJs({ type: "line" }), []);
             else result[result.length - 1].push(i);
           }
           return fromJs(
-            result
-              .reduce(
-                (res, r) => [
-                  ...res,
-                  fromJs({ type: "line" }),
-                  r.length === 1 ? r[0] : fromJs(r, false),
-                ],
-                []
-              )
-              .slice(1),
+            result.reduce(
+              (res, r) => [
+                ...res,
+                Array.isArray(r)
+                  ? r.length === 1
+                    ? r[0]
+                    : fromJs(r, false)
+                  : r,
+              ],
+              []
+            ),
             false
           );
         }),
@@ -257,6 +291,9 @@ export const printers = {
       }
       if (type === "line") {
         return line;
+      }
+      if (type === "hardline") {
+        return hardline;
       }
       if (type === "softline") {
         return softline;
