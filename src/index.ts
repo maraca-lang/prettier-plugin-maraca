@@ -199,7 +199,6 @@ const splitString = (str) =>
     : [
         ...(/^ /.test(str) ? [null] : []),
         ...str
-          .trim()
           .split(/\n/)
           .reduce(
             (res, s) => [
@@ -207,6 +206,7 @@ const splitString = (str) =>
               { type: "value", value: "\\" },
               undefined,
               ...s
+                .trim()
                 .split(/ /g)
                 .reduce(
                   (res, s) => [...res, null, { type: "value", value: s }],
