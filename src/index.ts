@@ -16,180 +16,141 @@ export const languages = [
 
 const script = `
 {
-  chunk=<(open close inner)=>
-    <type=group
-      @open
-      <type=indent
-        <type=softline>
-        @inner
-      >
-      <type=softline>
-      @close
+  chunk=
+    <
+      (open close inner)=>
+        <
+          type="group"
+          open
+          <type="indent" <type="softline"> inner>
+          <type="softline">
+          close
+        >
     >
-  >
-  array=<(open close content)=>
-    @chunk.<
-      open=@open
-      close=@close
-      inner=<type=join sep=<type=line> =@content>
+  array=
+    <
+      (open close content)=>
+        chunk.
+          <open=open close=close inner=<type="join" sep=<type="line"> =content>>
     >
-  >
-  operator=<(op content)=>
-    <type=group
-      <@map.(@content.1) " " @op>
-      <type=line>
-      @map.(@content.2)
+  operator=
+    <
+      (op content)=>
+        <type="group" <map.(content.1) " " op> <type="line"> map.(content.2)>
     >
-  >
-  set=<(key op content)=>
-    <type=group
-      <@key @op>
-      <type=indent
-        <type=softline>
-        @map.(@content.1)
-      >
+  set=
+    <
+      (key op content)=>
+        <
+          type="group"
+          <key op>
+          <type="indent" <type="softline"> map.(content.1)>
+        >
     >
-  >
-  base=<(type bracket func mode params key name **content)=>
-    {
-      [
-        (@type = block)
-        @array.<
-          open=@bracket
-          close=<"<"=">" "["="]" "{"="}">.@bracket
-          content=<(c)=>>@map.@c>.@content
-        >
-      ]
-
-      [
-        (@type = func)
-        @set.<
-          key=[
-            @isBlock.@params
-            @array.<
-              open=\\(
-              close=\\)
-              content=<(p)=>>
-                <@p.rest @p.key [@p.def <\\= @map.(@p.def)>]>
-              >.@params
-            >
-            =>@params
-          ]
-          op=@mode
-          content=@content
-        >
-      ]
-
-      [
-        (@type = merge)
-        @set.<key=<type=join sep=\\. =<(k)=>>@map.@k>.@key> op="+=" content=@content>
-      ]
-      [
-        (@type = attrs)
-        @set.<
-          key=@array.<
-            open=\\(
-            close=\\)
-            content=<(p)=>>
-              <@p.rest @p.key [@p.def <\\= @map.(@p.def)>]>
-            >.@key
-          >
-          op=\\=
-          content=@content
-        >
-      ]
-      [
-        (@type = attr)
-        @set.<key=@map.@key op=\\= content=@content>
-      ]
-      [
-        (@type = unpack)
-        <type=group
-          \\=
-          @map.(@content.1)
-        >
-      ]
-      
-      [
-        (@type = expr)
-        @chunk.<open=\\( close=\\) inner=@map.(@content.1)>
-      ]
-
-      [
-        (@type = dot)
-        <type=group
-          <@map.(@content.1) \\.>
-          <type=indent
-            <type=softline>
-            @map.(@content.2)
-          >
-        >
-      ]
-
-      [
-        (@type = pipe)
-        @operator.<op=\\| content=@content>
-      ]
-      [
-        (@type = map)
-        [
-          (#@content = 2)
-          @operator.<op=@func content=@content>
-          => <@func @map.(@content.1)>
-        ] 
-      ]
-      [
-        (@type = size)
-        <\\# @map.(@content.1)>
-      ]
-      [
-        (@type = var)
-        <\\@ @name>
-      ]
-
-      [
-        (@type = multi)
-        <type=fill
-          =@multiFill.<
-            \\"
-            =<<> (res c)=>>>
+  base=
+    <
+      (type bracket func mode params key name **content)=>
+        {
+          [
+            (type = "block")
+            array.
               <
-                =@res
-                =[
-                  (@c.type = block)
-                  <@map.@c>
-                  =>@mapTemplate.@c
-                ]
+                open=bracket
+                close=<"<"=\\> "["=\\] "{"=\\}>.bracket
+                content=<(c)=>>map.c>.content
               >
-            >.@content
-            \\"
-          >
-        >
-      ]
-      [
-        (@type = template)
-        <type=fill
-          =@multiFill.<
-            \\"
-            =@mapTemplate.@content
-            \\"
-          >
-        >
-      ]
-    }
-  >
-  mapTemplate=<(type **content)=>
-    <(c)=>>[@isBlock.@c @base.@c =>@escape.@c]>.@content
-  >
-  map=<v=>
-    {
-      [@isBlock.@v @base.@v]
-      [@alphaNum.@v @v]
-      [@single.@v "\\\\{@v}"]
-      "\\"{@v}\\""
-    }
-  >
-  @input.@map
+          ]
+          [
+            (type = "func")
+            set.
+              <
+                key=
+                  [
+                    isBlock.params
+                    array.
+                      <
+                        open=\\(
+                        close=\\)
+                        content=
+                          <
+                            (p)=>>
+                              <p."rest" p."key" [p."def" <\\= map.(p."def")>]>
+                          >.
+                            params
+                      >
+                    =>params
+                  ]
+                op=mode
+                content=content
+              >
+          ]
+          [(type = "merge") set.<key=mapKey.key op="+=" content=content>]
+          [(type = "attr") set.<key=mapKey.key op=\\= content=content>]
+          [
+            (type = "attrs")
+            set.
+              <
+                key=
+                  array.
+                    <
+                      open=\\(
+                      close=\\)
+                      content=
+                        <(p)=>><p."rest" p."key" [p."def" <\\= map.(p."def")>]>>.
+                          key
+                    >
+                op=\\=
+                content=content
+              >
+          ]
+          [(type = "unpack") <type="group" \\= map.(content.1)>]
+          [(type = "expr") chunk.<open=\\( close=\\) inner=map.(content.1)>]
+          [
+            (type = "dot")
+            <
+              type="group"
+              <map.(content.1) \\.>
+              <type="indent" <type="softline"> map.(content.2)>
+            >
+          ]
+          [(type = "pipe") operator.<op=\\| content=content>]
+          [
+            (type = "map")
+            [
+              (#content = 2)
+              operator.<op=func content=content>
+              =><func map.(content.1)>
+            ]
+          ]
+          [(type = "size") <\\# map.(content.1)>]
+          [(type = "var") <name>]
+          [
+            (type = "multi")
+            <
+              type="fill"
+              =multiFill.
+                <
+                  \\"
+                  =<
+                    <>
+                    (res c)=>>>
+                      <=res =[(c."type" = "block") <map.c> =>mapTemplate.c]>
+                  >.
+                    content
+                  \\"
+                >
+            >
+          ]
+          [
+            (type = "template")
+            <type="fill" =multiFill.<\\" =mapTemplate.content \\">>
+          ]
+        }
+    >
+  mapTemplate=<(type **content)=><(c)=>>[isBlock.c base.c =>escape.c]>.content>
+  mapKey=<v=>{[isAlnum.v v] "\\"{v}\\""}>
+  map=<v=>{[isBlock.v base.v] [isNumber.v v] [single.v "\\\\{v}"] "\\"{v}\\""}>
+  input.map
 }
 `;
 
@@ -226,7 +187,8 @@ export const parsers = {
       maraca(script, {
         input: parse(s),
         isBlock: fromJs((value) => fromJs(value.type === "block")),
-        alphaNum: fromJs((value) => fromJs(/^[a-zA-Z0-9]*$/.test(value.value))),
+        isAlnum: fromJs((value) => fromJs(/^[a-zA-Z0-9]*$/.test(value.value))),
+        isNumber: fromJs((value) => fromJs(/^\d+$/.test(value.value))),
         single: fromJs((value) => fromJs(value.value.length === 1)),
         escape: fromJs((value) =>
           fromJs(value.value.replace(/\<|\>|\[|\]|\{|\}|"/g, (m) => `\\${m}`))
